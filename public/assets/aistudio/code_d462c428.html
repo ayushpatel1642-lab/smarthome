@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Gellix:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode: "class", theme: {extend: {colors: {"surface-container-high": "#e5e8ec", "inverse-on-surface": "#eef1f5", "on-primary-container": "#d9deff", success: "#22C55E", "surface-container-low": "#f1f4f8", "inverse-surface": "#2d3134", "on-primary-fixed": "#001550", "secondary-fixed": "#dbe1ff", background: "#f7f9fe", "on-secondary-fixed": "#001849", "surface-tint": "#004ee7", "on-secondary-fixed-variant": "#31447a", "primary-fixed-dim": "#b6c4ff", "on-secondary": "#ffffff", "surface-container-highest": "#e0e3e7", "on-tertiary-fixed-variant": "#1936b7", "tertiary-container": "#3e56d4", "on-surface-variant": "#434656", "secondary-fixed-dim": "#b3c5ff", primary: "#003ebc", "on-secondary-container": "#394d83", "on-error": "#ffffff", "surface-variant": "#e0e3e7", "primary-fixed": "#dce1ff", secondary: "#495c93", "tertiary-fixed": "#dee0ff", "on-tertiary-container": "#dbdeff", "surface-container-lowest": "#ffffff", "text-muted": "#8B98A5", "inverse-primary": "#b6c4ff", "on-error-container": "#93000a", "on-background": "#181c1f", "surface-bright": "#f7f9fe", outline: "#737687", "text-primary": "#E8EEF4", error: "#ba1a1a", "surface-container": "#ebeef2", "surface-dim": "#d7dade", "outline-variant": "#c3c5d9", "primary-container": "#0052f2", "error-container": "#ffdad6", "on-primary": "#ffffff", "tertiary-fixed-dim": "#bac3ff", "on-tertiary-fixed": "#00105b", "on-surface": "#181c1f", tertiary: "#203bbb", surface: "#f7f9fe", "on-primary-fixed-variant": "#003ab2", "secondary-container": "#acbffd", "on-tertiary": "#ffffff", "blue-on-black": "#4083FF", red: "#F23845", pink: "#FF7D78", violet: "#A373FF"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {margin: "1.5rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "gutter-sm": "0.75rem", "space-md": "1rem", gutter: "1rem", "gutter-lg": "1.5rem", "margin-tablet": "1.5rem", "margin-desktop": "2rem", "space-xl": "2rem", "space-sm": "0.5rem"}, fontFamily: {"body-default": ["Inter"], "display-metric-sm": ["Inter"], "title-card": ["Inter"], "display-metric": ["Inter"], "headline-lg": ["Inter"], "label-caption": ["Inter"], "body-medium": ["Inter"], "label-micro": ["Inter"], "headline-sm": ["Inter"], "text-xxs": ["Gellix"], "title-xl-mobile": ["Gellix"], "title-xl": ["Gellix"], "title-xxl": ["Gellix"], "text-xs": ["Gellix"], "title-s": ["Gellix"], "eyebrow-s": ["Gellix"], "text-m": ["Gellix"], "title-l": ["Gellix"], "text-s": ["Gellix"], "title-xxl-mobile": ["Gellix"], "text-xl": ["Gellix"], "text-l": ["Gellix"], "eyebrow-m": ["Gellix"], "title-l-mobile": ["Gellix"], "title-xs": ["Gellix"], "title-m-mobile": ["Gellix"], "title-m": ["Gellix"]}, fontSize: {"body-default": ["14px", {lineHeight: "20px", fontWeight: "400"}], "display-metric-sm": ["32px", {lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "600"}], "title-card": ["16px", {lineHeight: "22px", letterSpacing: "-0.005em", fontWeight: "500"}], "display-metric": ["40px", {lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "600"}], "headline-lg": ["24px", {lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "600"}], "label-caption": ["12px", {lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "500"}], "body-medium": ["14px", {lineHeight: "20px", fontWeight: "500"}], "label-micro": ["10px", {lineHeight: "14px", letterSpacing: "0.04em", fontWeight: "600"}], "headline-sm": ["18px", {lineHeight: "24px", letterSpacing: "-0.01em", fontWeight: "600"}], "text-xxs": ["10px", {lineHeight: "13px", fontWeight: "600"}], "title-xl-mobile": ["36px", {lineHeight: "40px", fontWeight: "600"}], "title-xl": ["56px", {lineHeight: "62px", fontWeight: "600"}], "title-xxl": ["64px", {lineHeight: "70px", fontWeight: "700"}], "text-xs": ["12px", {lineHeight: "16px", fontWeight: "500"}], "title-s": ["28px", {lineHeight: "31px", fontWeight: "600"}], "eyebrow-s": ["12px", {lineHeight: "1.2", fontWeight: "600"}], "text-m": ["16px", {lineHeight: "22px", fontWeight: "400"}], "title-l": ["44px", {lineHeight: "48px", fontWeight: "600"}], "text-s": ["14px", {lineHeight: "19px", fontWeight: "500"}], "title-xxl-mobile": ["40px", {lineHeight: "44px", fontWeight: "700"}], "text-xl": ["20px", {lineHeight: "27px", fontWeight: "400"}], "text-l": ["18px", {lineHeight: "24px", fontWeight: "400"}], "eyebrow-m": ["14px", {lineHeight: "1.2", fontWeight: "600"}], "title-l-mobile": ["32px", {lineHeight: "36px", fontWeight: "600"}], "title-xs": ["22px", {lineHeight: "24px", fontWeight: "500"}], "title-m-mobile": ["28px", {lineHeight: "32px", fontWeight: "600"}], "title-m": ["36px", {lineHeight: "40px", fontWeight: "600"}]}}}};</script></head><body class="bg-surface font-body-default text-body-default text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-low border-r border-outline z-50 flex flex-col justify-between select-none"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm border-b border-outline"><div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container"><span class="material-symbols-outlined text-[20px]">sensors</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-text-primary tracking-tight leading-none">AWARE</span><span class="font-label-micro text-label-micro text-text-muted uppercase tracking-widest">Instrument OS</span></div></div><div class="px-space-md py-space-sm"><span class="font-label-micro text-label-micro uppercase text-text-muted px-space-sm tracking-wider">Telemetry &amp; Node Systems</span></div><nav class="flex flex-col gap-space-xs px-space-sm" data-active-classes="bg-surface-container-high text-primary border-l-2 border-primary"><a aria-current="page" class="flex items-center gap-space-md px-space-md py-space-sm rounded transition-colors font-body-medium bg-surface-container-high text-primary border-l-2 border-primary" data-path="home" href="#"><span class="material-symbols-outlined text-[20px]">home</span><span>Home</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-medium text-body-medium" data-path="devices" href="#"><span class="material-symbols-outlined text-[20px]">devices</span><span>Devices</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-medium text-body-medium" data-path="automation" href="#"><span class="material-symbols-outlined text-[20px]">account_tree</span><span>Automation</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-medium text-body-medium" data-path="energy" href="#"><span class="material-symbols-outlined text-[20px]">bolt</span><span>Energy</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-medium text-body-medium" data-path="security" href="#"><span class="material-symbols-outlined text-[20px]">verified_user</span><span>Security</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-medium text-body-medium" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span>Settings</span></a></nav></div><div class="p-space-md border-t border-outline bg-surface-container-lowest"><div class="flex items-center justify-between p-space-sm rounded bg-surface-container border border-outline"><div class="flex items-center gap-space-sm min-w-0"><div class="relative flex-shrink-0"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-success rounded-full border-2 border-surface-container"></span></div><div class="flex flex-col min-w-0"><span class="font-body-medium text-body-medium text-text-primary truncate">Master Unit</span><span class="font-label-micro text-label-micro text-success flex items-center gap-1"><span class="inline-block w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>Online</span></div></div><a class="text-text-muted hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[18px]">more_vert</span></a></div></div></aside><div class="pl-64 flex flex-col min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-low/95 backdrop-blur-md border-b border-outline z-40 flex items-center justify-between px-space-xl"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container-high border border-outline text-text-muted font-label-micro text-label-micro"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span><span>HUB 01 // SECTOR A</span></div></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs text-text-muted"><button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span></button><button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">terminal</span></button></div><div class="h-4 w-px bg-outline"></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-16 bg-surface flex-1 w-full px-space-xl py-space-lg"><div class="flex flex-col w-full gap-space-lg">
+<!-- Top Greeting & Mode Selector Bar -->
+<section class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<h1 class="font-headline-lg text-headline-lg text-text-primary tracking-tight">Good evening, Ayush</h1>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-primary-container/20 text-primary font-label-micro text-label-micro uppercase tracking-wider">Telemetry Live</span>
+</div>
+<p class="font-body-default text-body-default text-text-muted mt-0.5">
+        Thursday, Oct 24 • Oakridge Residence • 12 Active Nodes
+      </p>
+</div>
+<!-- Quick Mode Selectors -->
+<div class="flex items-center gap-space-xs bg-surface-container-low p-1 rounded-lg border border-outline self-start md:self-auto">
+<button class="flex items-center gap-space-xs px-3 py-1.5 rounded-md bg-primary-container text-on-primary-container font-body-medium text-body-medium shadow-sm transition-all" id="mode-home" onclick="setMode('home')">
+<span class="material-symbols-outlined text-[18px]">home</span>
+<span>Home</span>
+</button>
+<button class="flex items-center gap-space-xs px-3 py-1.5 rounded-md text-text-muted hover:text-on-surface hover:bg-surface-container-high font-body-medium text-body-medium transition-all" id="mode-away" onclick="setMode('away')">
+<span class="material-symbols-outlined text-[18px]">directions_walk</span>
+<span>Away</span>
+</button>
+<button class="flex items-center gap-space-xs px-3 py-1.5 rounded-md text-text-muted hover:text-on-surface hover:bg-surface-container-high font-body-medium text-body-medium transition-all" id="mode-night" onclick="setMode('night')">
+<span class="material-symbols-outlined text-[18px]">bedtime</span>
+<span>Night</span>
+</button>
+<button class="flex items-center gap-space-xs px-3 py-1.5 rounded-md text-text-muted hover:text-on-surface hover:bg-surface-container-high font-body-medium text-body-medium transition-all" id="mode-auto" onclick="setMode('auto')">
+<span class="material-symbols-outlined text-[18px]">auto_mode</span>
+<span>Auto</span>
+</button>
+</div>
+</section>
+<!-- 3-Column Instrument Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-lg items-start">
+<!-- COLUMN 1: Climate & Security -->
+<div class="flex flex-col gap-space-lg">
+<!-- Indoor Climate Instrument Card -->
+<div class="bg-surface-container-low border border-outline rounded-xl p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">thermostat</span>
+<span class="font-title-card text-title-card text-text-primary">Indoor Climate</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-high border border-outline font-label-micro text-label-micro text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            Optimal Loop
+          </span>
+</div>
+<!-- Metric & Target Display -->
+<div class="flex items-baseline justify-between pt-space-xs">
+<div>
+<div class="flex items-baseline gap-1">
+<span class="font-display-metric text-display-metric text-text-primary font-semibold tabular-nums" id="temp-display">24.5</span>
+<span class="text-text-muted font-display-metric-sm text-display-metric-sm">°C</span>
+</div>
+<p class="font-label-caption text-label-caption text-success flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+              Comfort target optimal
+            </p>
+</div>
+<!-- Stepper Target Controls -->
+<div class="flex items-center bg-surface-container-high rounded-lg border border-outline p-0.5">
+<button aria-label="Decrease Target Temperature" class="w-9 h-9 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" onclick="adjustTemp(-0.5)">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<div class="px-2 font-label-caption text-label-caption text-text-muted tabular-nums">0.5°</div>
+<button aria-label="Increase Target Temperature" class="w-9 h-9 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" onclick="adjustTemp(0.5)">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+<!-- Ambient Environmental Metrology Quad -->
+<div class="grid grid-cols-3 gap-space-sm bg-surface-container rounded-lg p-space-sm border border-outline">
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro text-text-muted uppercase">Outdoor</span>
+<span class="font-body-medium text-body-medium text-text-primary tabular-nums mt-0.5">31.0°C</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro text-text-muted uppercase">Humidity</span>
+<span class="font-body-medium text-body-medium text-text-primary tabular-nums mt-0.5">58% RH</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro text-text-muted uppercase">Occupancy</span>
+<span class="font-body-medium text-body-medium text-text-primary tabular-nums mt-0.5">2 Home</span>
+</div>
+</div>
+<!-- HVAC Controller Status Strip -->
+<div class="flex items-center justify-between pt-space-xs text-text-muted font-label-caption text-label-caption border-t border-outline">
+<span class="flex items-center gap-1.5 text-text-primary">
+<span class="material-symbols-outlined text-[16px] text-primary">mode_fan</span>
+            AC Cooling • Stage 1 Eco
+          </span>
+<span class="tabular-nums">Set: 24.0°C</span>
+</div>
+</div>
+<!-- Security System Instrument Card -->
+<div class="bg-surface-container-low border border-outline rounded-xl p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-success text-[20px]">verified_user</span>
+<span class="font-title-card text-title-card text-text-primary">Perimeter Security</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/30 font-label-micro text-label-micro">
+            Armed: Home
+          </span>
+</div>
+<p class="font-label-caption text-label-caption text-text-muted -mt-2">
+          Perimeter monitoring active. Exterior sensors primed.
+        </p>
+<!-- Monitored Zones Breakdown -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between py-2 px-space-sm rounded bg-surface-container border border-outline">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-body-default text-body-default text-text-primary">Front Door Sensor</span>
+</div>
+<span class="font-label-caption text-label-caption text-text-muted uppercase">Closed</span>
+</div>
+<div class="flex items-center justify-between py-2 px-space-sm rounded bg-surface-container border border-outline">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-body-default text-body-default text-text-primary">Living Room Casement</span>
+</div>
+<span class="font-label-caption text-label-caption text-text-muted uppercase">Closed</span>
+</div>
+<div class="flex items-center justify-between py-2 px-space-sm rounded bg-surface-container border border-outline">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-body-default text-body-default text-text-primary">Hallway PIR Motion</span>
+</div>
+<span class="font-label-caption text-label-caption text-text-muted uppercase">Clear</span>
+</div>
+<div class="flex items-center justify-between py-2 px-space-sm rounded bg-surface-container border border-outline">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-body-default text-body-default text-text-primary">Master Entry Deadbolt</span>
+</div>
+<span class="font-label-caption text-label-caption text-primary uppercase font-medium">Locked</span>
+</div>
+</div>
+<!-- Disarm CTA Button -->
+<button class="w-full py-2 px-space-md rounded-lg bg-surface-container-high border border-outline hover:border-error/50 hover:bg-error/10 hover:text-error text-text-muted font-body-medium text-body-medium transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">lock_open</span>
+<span>Disarm Perimeter</span>
+</button>
+</div>
+</div>
+<!-- COLUMN 2: Telemetry, AI Assist & Quick Tiles -->
+<div class="flex flex-col gap-space-lg">
+<!-- Energy Consumption Instrument Card -->
+<div class="bg-surface-container-low border border-outline rounded-xl p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">bolt</span>
+<span class="font-title-card text-title-card text-text-primary">Daily Energy Load</span>
+</div>
+<span class="font-label-micro text-label-micro text-text-muted uppercase">Grid • Submeter #04</span>
+</div>
+<div class="flex items-baseline justify-between">
+<div>
+<div class="flex items-baseline gap-1.5">
+<span class="font-display-metric text-display-metric text-text-primary tabular-nums font-semibold">3.2</span>
+<span class="font-display-metric-sm text-display-metric-sm text-text-muted">kWh</span>
+</div>
+<span class="font-label-caption text-label-caption text-success flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+              12% lower than rolling avg
+            </span>
+</div>
+<div class="text-right">
+<span class="font-label-micro text-label-micro text-text-muted uppercase block">Instantaneous</span>
+<span class="font-body-medium text-body-medium text-text-primary tabular-nums">480 W</span>
+</div>
+</div>
+<!-- 24h Telemetry Histogram Chart -->
+<div class="flex flex-col gap-1.5 pt-space-xs">
+<div class="h-28 w-full flex items-end gap-1.5 px-1 bg-surface-container/60 rounded-lg p-2 border border-outline">
+<!-- Histogram segments with baseline indicator -->
+<div class="flex-1 bg-surface-container-high hover:bg-primary-container rounded-t-sm h-[32%] transition-all" title="00:00 - 0.18 kWh"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary-container rounded-t-sm h-[25%] transition-all" title="02:00 - 0.14 kWh"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary-container rounded-t-sm h-[20%] transition-all" title="04:00 - 0.12 kWh"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary-container rounded-t-sm h-[38%] transition-all" title="06:00 - 0.22 kWh"></div>
+<div class="flex-1 bg-primary-container hover:bg-primary rounded-t-sm h-[65%] transition-all" title="08:00 - 0.42 kWh"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary-container rounded-t-sm h-[45%] transition-all" title="10:00 - 0.28 kWh"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary-container rounded-t-sm h-[40%] transition-all" title="12:00 - 0.25 kWh"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary-container rounded-t-sm h-[52%] transition-all" title="14:00 - 0.33 kWh"></div>
+<div class="flex-1 bg-primary-container hover:bg-primary rounded-t-sm h-[78%] transition-all" title="16:00 - 0.51 kWh"></div>
+<div class="flex-1 bg-primary-container hover:bg-primary rounded-t-sm h-[92%] transition-all" title="18:00 - 0.62 kWh"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-[85%] transition-all" title="Current - 0.58 kWh"></div>
+<div class="flex-1 bg-surface-container rounded-t-sm h-[15%] opacity-40 border-dashed border-t border-outline" title="Projected 22:00"></div>
+</div>
+<div class="flex justify-between font-label-micro text-label-micro text-text-muted px-1">
+<span>00:00</span>
+<span>06:00</span>
+<span>12:00</span>
+<span>18:00</span>
+<span class="text-primary font-medium">Now</span>
+</div>
+</div>
+</div>
+<!-- AI Aware Assist Suggestion Card -->
+<div class="bg-surface-container-low border border-primary/40 rounded-xl p-space-lg flex flex-col gap-space-md relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-primary font-label-micro text-label-micro uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">psychology</span>
+<span>Aware Assist Recommendation</span>
+</div>
+<span class="font-label-micro text-label-micro text-text-muted">High Confidence</span>
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="font-title-card text-title-card text-text-primary">Pre-cool living room at 5:30 PM</h2>
+<p class="font-body-default text-body-default text-text-muted">
+            Shift thermal load ahead of peak pricing window. Anticipated savings: <span class="text-text-primary font-medium">~0.8 kWh (≈ ₹14.20)</span> without affecting comfort.
+          </p>
+</div>
+<div class="flex items-center gap-space-sm pt-space-xs">
+<button class="flex-1 py-2 px-space-md rounded-md bg-primary text-surface-container-lowest font-body-medium text-body-medium font-medium hover:bg-primary-fixed transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">done</span>
+<span>Apply Schedule</span>
+</button>
+<button class="py-2 px-space-md rounded-md bg-surface-container-high border border-outline text-text-muted hover:text-text-primary transition-colors font-body-medium text-body-medium">
+            Dismiss
+          </button>
+</div>
+</div>
+<!-- Quick Action Controls 2x2 Grid -->
+<div class="grid grid-cols-2 gap-space-sm">
+<button class="bg-surface-container-low border border-outline hover:border-primary/50 hover:bg-surface-container p-space-md rounded-xl flex flex-col items-start gap-space-sm transition-all text-left group">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">light_off</span>
+</div>
+<div>
+<div class="font-body-medium text-body-medium text-text-primary">All Lights Off</div>
+<span class="font-label-micro text-label-micro text-text-muted">5 fixtures running</span>
+</div>
+</button>
+<button class="bg-surface-container-low border border-outline hover:border-primary/50 hover:bg-surface-container p-space-md rounded-xl flex flex-col items-start gap-space-sm transition-all text-left group">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">flight_takeoff</span>
+</div>
+<div>
+<div class="font-body-medium text-body-medium text-text-primary">Away Mode</div>
+<span class="font-label-micro text-label-micro text-text-muted">Arms all perimeter sensors</span>
+</div>
+</button>
+<button class="bg-surface-container-low border border-outline hover:border-primary/50 hover:bg-surface-container p-space-md rounded-xl flex flex-col items-start gap-space-sm transition-all text-left group">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">nights_stay</span>
+</div>
+<div>
+<div class="font-body-medium text-body-medium text-text-primary">Night Mode</div>
+<span class="font-label-micro text-label-micro text-text-muted">Low lum, blinds closed</span>
+</div>
+</button>
+<button class="bg-surface-container-low border border-outline hover:border-primary/50 hover:bg-surface-container p-space-md rounded-xl flex flex-col items-start gap-space-sm transition-all text-left group">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<div>
+<div class="font-body-medium text-body-medium text-text-primary">Lock All Doors</div>
+<span class="font-label-micro text-label-micro text-text-muted">3 electronic locks</span>
+</div>
+</button>
+</div>
+</div>
+<!-- COLUMN 3: Subsystems Status & Telemetry Event Log -->
+<div class="flex flex-col gap-space-lg">
+<!-- Subsystems Health Card -->
+<div class="bg-surface-container-low border border-outline rounded-xl p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+<span class="font-title-card text-title-card text-text-primary">Active Subsystems</span>
+</div>
+<span class="font-label-micro text-label-micro text-text-muted uppercase">Health Normal</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Lighting Subsystem Item -->
+<div class="p-space-sm rounded-lg bg-surface-container border border-outline flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-body-medium text-body-medium text-text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">lightbulb</span>
+                Lighting
+              </span>
+<span class="font-label-micro text-label-micro text-text-muted uppercase">5 / 12 Active</span>
+</div>
+<div class="flex items-center justify-between text-text-muted font-label-caption text-label-caption pt-1 border-t border-outline/50">
+<span class="truncate">Ceiling Luminaire (70%)</span>
+<span class="tabular-nums">Nordic Lamp (40%)</span>
+</div>
+</div>
+<!-- Climate Subsystem Item -->
+<div class="p-space-sm rounded-lg bg-surface-container border border-outline flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-body-medium text-body-medium text-text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">hvac</span>
+                Climate Matrix
+              </span>
+<span class="font-label-micro text-label-micro text-primary uppercase">AC Online</span>
+</div>
+<div class="flex items-center justify-between text-text-muted font-label-caption text-label-caption pt-1 border-t border-outline/50">
+<span>Living Room: 24.0°C</span>
+<span>Mode: Eco Smart</span>
+</div>
+</div>
+<!-- Network Subsystem Item -->
+<div class="p-space-sm rounded-lg bg-surface-container border border-outline flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-body-medium text-body-medium text-text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">hub</span>
+                Network &amp; Mesh Hub
+              </span>
+<span class="font-label-micro text-label-micro text-text-muted uppercase">8 Online • 1 Offline</span>
+</div>
+<div class="flex items-center justify-between text-text-muted font-label-caption text-label-caption pt-1 border-t border-outline/50">
+<span>MQTT Bus Latency</span>
+<span class="tabular-nums text-text-primary font-medium">42 ms</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Telemetry Activity & Event Log Feed -->
+<div class="bg-surface-container-low border border-outline rounded-xl p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-text-muted text-[20px]">history</span>
+<span class="font-title-card text-title-card text-text-primary">Recent Events</span>
+</div>
+<button class="font-label-micro text-label-micro text-text-muted hover:text-text-primary uppercase transition-colors">Clear Log</button>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Event Item 1 -->
+<div class="flex items-start gap-space-sm pb-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary mt-1.5 shrink-0"></span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-body-medium text-body-medium text-text-primary truncate">Front door locked automatically</span>
+<span class="font-label-micro text-label-micro text-text-muted">Smart Lock • 12m ago</span>
+</div>
+</div>
+<!-- Event Item 2 -->
+<div class="flex items-start gap-space-sm pb-space-xs border-t border-outline/40 pt-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary mt-1.5 shrink-0"></span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-body-medium text-body-medium text-text-primary truncate">Eco mode activated for HVAC</span>
+<span class="font-label-micro text-label-micro text-text-muted">Thermostat Node • 34m ago</span>
+</div>
+</div>
+<!-- Event Item 3 -->
+<div class="flex items-start gap-space-sm pb-space-xs border-t border-outline/40 pt-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary mt-1.5 shrink-0"></span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-body-medium text-body-medium text-text-primary truncate">Living room ambient lights dimmed</span>
+<span class="font-label-micro text-label-micro text-text-muted">Scene: Sunset Transition • 1h ago</span>
+</div>
+</div>
+<!-- Event Item 4 -->
+<div class="flex items-start gap-space-sm pb-space-xs border-t border-outline/40 pt-space-xs">
+<span class="w-2 h-2 rounded-full bg-success mt-1.5 shrink-0"></span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-body-medium text-body-medium text-text-primary truncate">Motion detected Hallway</span>
+<span class="font-label-micro text-label-micro text-text-muted">Zone 2 Sensor • 02:14 AM</span>
+</div>
+</div>
+<!-- Event Item 5 -->
+<div class="flex items-start gap-space-sm border-t border-outline/40 pt-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary mt-1.5 shrink-0"></span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="font-body-medium text-body-medium text-text-primary truncate">Back patio sensor low battery</span>
+<span class="font-label-micro text-label-micro text-tertiary">Patio Zigbee Node • Yesterday</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  let currentTemp = 24.5;
+  function adjustTemp(delta) {
+    currentTemp = Math.round((currentTemp + delta) * 10) / 10;
+    const el = document.getElementById('temp-display');
+    if (el) el.textContent = currentTemp.toFixed(1);
+  }
+
+  function setMode(mode) {
+    const modes = ['home', 'away', 'night', 'auto'];
+    modes.forEach(m => {
+      const btn = document.getElementById('mode-' + m);
+      if (!btn) return;
+      if (m === mode) {
+        btn.className = 'flex items-center gap-space-xs px-3 py-1.5 rounded-md bg-primary-container text-on-primary-container font-body-medium text-body-medium shadow-sm transition-all';
+      } else {
+        btn.className = 'flex items-center gap-space-xs px-3 py-1.5 rounded-md text-text-muted hover:text-on-surface hover:bg-surface-container-high font-body-medium text-body-medium transition-all';
+      }
+    });
+  }
+</script></main></div></body></html>

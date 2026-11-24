@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Aware Home - Context-Aware Smart Home OS</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Gellix:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  
+  <!-- Material Symbols: Exact required link format -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0052f2",
+            "primary-container": "#0052f2",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#d9deff",
+            "primary-fixed": "#dce1ff",
+            "primary-fixed-dim": "#b6c4ff",
+            secondary: "#495c93",
+            "secondary-container": "#acbffd",
+            "on-secondary-container": "#394d83",
+            tertiary: "#14b8a6",
+            "tertiary-container": "#3e56d4",
+            "on-tertiary-container": "#dbdeff",
+            surface: "#0f1419",
+            "surface-dim": "#181c1f",
+            "surface-bright": "#222b35",
+            "surface-container-lowest": "#0a0d10",
+            "surface-container-low": "#151b22",
+            "surface-container": "#1a2129",
+            "surface-container-high": "#222b35",
+            "surface-container-highest": "#2c3744",
+            "on-surface": "#e8eef4",
+            "on-surface-variant": "#8b98a5",
+            outline: "#737687",
+            "outline-variant": "#2c3744",
+            error: "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            success: "#22c55e",
+            "text-primary": "#e8eef4",
+            "text-muted": "#8b98a5"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            sm: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "9999px"
+          },
+          fontFamily: {
+            body: ["Inter", "sans-serif"],
+            sans: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #0f1419;
+        color: #e8eef4;
+        font-family: 'Inter', -apple-system, sans-serif;
+        overscroll-behavior: none;
+      }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-filled {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+
+  <!-- Required React 18 & Router 6 Scripts -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+  <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+  <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#0f1419] text-[#e8eef4] antialiased select-none min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { createRoot } = ReactDOM;
+    const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+    // --- SHARED APP HEADER ---
+    function Header({ title, backPath, showLiveBadge = true }) {
+      const navigate = useNavigate();
+      return (
+        <header className="fixed top-0 inset-x-0 z-50 bg-[#0f1419]/90 backdrop-blur-xl border-b border-[#2C3744] pt-safe">
+          <div className="h-16 px-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {backPath ? (
+                <button 
+                  onClick={() => navigate(backPath)} 
+                  className="w-10 h-10 flex items-center justify-center text-[#e8eef4] hover:text-primary transition-colors -ml-2"
+                  aria-label="Back"
+                >
+                  <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+                </button>
+              ) : null}
+              <span className="font-semibold text-lg text-[#e8eef4] tracking-tight">{title || "Aware Home"}</span>
+              {showLiveBadge && (
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#222B35] border border-[#2C3744] ml-1">
+                  <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse"></span>
+                  <span className="text-[10px] text-[#8B98A5] uppercase font-bold tracking-wider">Live</span>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Link to="/settings" className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-semibold hover:opacity-90 transition-opacity">
+                <span className="material-symbols-outlined text-[18px]">person</span>
+              </Link>
+            </div>
+          </div>
+        </header>
+      );
+    }
+
+    // --- SHARED BOTTOM NAV BAR ---
+    function BottomNav() {
+      const location = useLocation();
+      const current = location.pathname;
+
+      // Don't show bottom nav on full-screen login or desktop mode
+      if (current === "/login") return null;
+
+      const tabs = [
+        { path: "/", label: "Home", icon: "home" },
+        { path: "/devices", label: "Devices", icon: "devices" },
+        { path: "/automation", label: "Automation", icon: "hdr_auto" },
+        { path: "/energy", label: "Energy", icon: "bolt" },
+        { path: "/security", label: "Security", icon: "shield" },
+      ];
+
+      return (
+        <nav className="fixed bottom-0 inset-x-0 z-50 bg-[#0f1419]/95 backdrop-blur-xl border-t border-[#2C3744] pb-safe shadow-lg">
+          <div className="flex items-center justify-around h-16 px-2">
+            {tabs.map((tab) => {
+              const active = current === tab.path || (tab.path === "/security" && current === "/security/alert");
+              return (
+                <Link
+                  key={tab.path}
+                  to={tab.path}
+                  className={`flex flex-col items-center justify-center w-16 h-12 gap-0.5 transition-colors ${
+                    active ? "text-[#0052f2] font-semibold" : "text-[#8B98A5] hover:text-[#e8eef4]"
+                  }`}
+                >
+                  <span className={`material-symbols-outlined text-[22px] ${active ? "material-symbols-filled text-[#0052f2]" : ""}`}>
+                    {tab.icon}
+                  </span>
+                  <span className="text-[10px]">{tab.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 1: LOGIN PAGE
+    // ==========================================
+    function LoginPage() {
+      const navigate = useNavigate();
+      const [email, setEmail] = useState("resident@awarehome.internal");
+      const [password, setPassword] = useState("••••••••••••");
+      const [showPass, setShowPass] = useState(false);
+      const [loading, setLoading] = useState(false);
+
+      const handleSignIn = (e) => {
+        if (e) e.preventDefault();
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+          navigate("/");
+        }, 800);
+      };
+
+      return (
+        <div className="min-h-screen bg-[#0f1419] flex flex-col justify-center px-5 py-8 relative overflow-hidden">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-80 bg-primary/15 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="flex flex-col items-center text-center mb-6">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A2129] border border-[#2C3744] mb-4">
+              <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse"></span>
+              <span className="text-xs text-[#8B98A5] uppercase tracking-wider font-mono">Aware OS v2.4</span>
+            </div>
+            
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#0052f2] to-[#14B8A6] flex items-center justify-center p-0.5 shadow-xl mb-3">
+              <div className="w-full h-full bg-[#1A2129] rounded-2xl flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-[#0052f2]">sensors</span>
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#e8eef4]">Aware Home</h1>
+            <p className="text-sm text-[#8B98A5] mt-1">Smarter home. Lower bills.</p>
+          </div>
+
+          <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-5 shadow-2xl max-w-md mx-auto w-full">
+            <h2 className="text-lg font-semibold text-[#e8eef4]">Welcome back</h2>
+            <p className="text-xs text-[#8B98A5] mb-5">Sign in to monitor household grid & devices</p>
+
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div>
+                <label className="text-xs text-[#8B98A5] block mb-1">Email Address</label>
+                <div className="relative flex items-center">
+                  <span className="material-symbols-outlined absolute left-3 text-[18px] text-[#8B98A5]">alternate_email</span>
+                  <input 
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full h-11 bg-[#222B35] rounded-lg pl-10 pr-3 text-sm text-[#e8eef4] focus:outline-none focus:ring-1 focus:ring-primary border border-transparent focus:border-primary"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-[#8B98A5] block mb-1">Password</label>
+                <div className="relative flex items-center">
+                  <span className="material-symbols-outlined absolute left-3 text-[18px] text-[#8B98A5]">lock</span>
+                  <input 
+                    type={showPass ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full h-11 bg-[#222B35] rounded-lg pl-10 pr-10 text-sm text-[#e8eef4] focus:outline-none focus:ring-1 focus:ring-primary border border-transparent focus:border-primary"
+                    required
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPass(!showPass)}
+                    className="absolute right-3 text-[#8B98A5] hover:text-[#e8eef4]"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {showPass ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-1">
+                <label className="flex items-center gap-2 cursor-pointer text-[#8B98A5]">
+                  <input type="checkbox" defaultChecked className="rounded accent-primary" />
+                  <span>Remember device</span>
+                </label>
+                <span className="text-primary hover:underline cursor-pointer">Forgot password?</span>
+              </div>
+
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full h-11 bg-primary hover:bg-blue-600 active:scale-[0.98] rounded-lg text-white font-medium text-sm flex items-center justify-center gap-2 transition-all shadow-lg"
+              >
+                {loading ? (
+                  <span className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                ) : (
+                  <>
+                    <span>Sign in</span>
+                    <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  </>
+                )}
+              </button>
+
+              <button 
+                type="button"
+                onClick={handleSignIn}
+                className="w-full h-11 bg-[#222B35] hover:bg-[#2C3744] active:scale-[0.98] rounded-lg text-[#e8eef4] font-medium text-xs flex items-center justify-center gap-2 border border-[#2C3744] transition-all"
+              >
+                <span className="material-symbols-outlined text-[18px] text-primary">fingerprint</span>
+                <span>Passkey or Face ID</span>
+              </button>
+            </form>
+          </div>
+
+          <div className="text-center mt-6 text-xs text-[#8B98A5] flex items-center justify-center gap-2">
+            <span className="material-symbols-outlined text-sm text-[#14B8A6]">verified_user</span>
+            <span>Secured Node Connection • TLS 1.3</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 2: HOME DASHBOARD (MOBILE)
+    // ==========================================
+    function HomeScreen() {
+      const navigate = useNavigate();
+      const [houseMode, setHouseMode] = useState("auto");
+      const [temp, setTemp] = useState(24.5);
+      const [showAiCard, setShowAiCard] = useState(true);
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24">
+          <Header title="Aware Home" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            {/* Greeting & Modes */}
+            <div className="flex flex-col gap-3">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-[#e8eef4]">Good evening, Ayush</h1>
+                <p className="text-xs text-[#8B98A5] flex items-center gap-1.5 mt-0.5 font-mono">
+                  <span>Thursday, Oct 24</span>
+                  <span>•</span>
+                  <span>Oakridge Residence</span>
+                </p>
+              </div>
+
+              {/* Mode Selector */}
+              <div className="grid grid-cols-4 gap-1 p-1 bg-[#1A2129] border border-[#2C3744] rounded-xl">
+                {[
+                  { id: "home", label: "Home", icon: "home" },
+                  { id: "away", label: "Away", icon: "directions_walk" },
+                  { id: "night", label: "Night", icon: "bedtime" },
+                  { id: "auto", label: "Auto", icon: "auto_mode" }
+                ].map(mode => (
+                  <button
+                    key={mode.id}
+                    onClick={() => setHouseMode(mode.id)}
+                    className={`h-10 rounded-lg flex items-center justify-center gap-1.5 text-xs transition-all ${
+                      houseMode === mode.id 
+                        ? "bg-primary text-white font-semibold shadow" 
+                        : "text-[#8B98A5] hover:text-[#e8eef4]"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[17px]">{mode.icon}</span>
+                    <span>{mode.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Indoor Climate Hero */}
+            <div 
+              onClick={() => navigate("/device-detail")}
+              className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex flex-col gap-3 cursor-pointer hover:border-primary/50 transition-colors shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#14B8A6] animate-pulse"></span>
+                  <span className="text-xs font-semibold text-[#8B98A5] uppercase tracking-wider">Indoor Climate</span>
+                </div>
+                <div className="flex items-center gap-1 bg-[#222B35] px-2.5 py-1 rounded-full text-xs text-[#14B8A6]">
+                  <span className="material-symbols-outlined text-[14px]">sunny</span>
+                  <span>Outdoor 31°C</span>
+                </div>
+              </div>
+
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-bold font-mono text-[#e8eef4]">{temp.toFixed(1)}</span>
+                    <span className="text-sm font-semibold text-[#8B98A5]">°C</span>
+                  </div>
+                  <p className="text-xs text-[#14B8A6] flex items-center gap-1 mt-1 font-medium">
+                    <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                    Target Optimal (Tap for dial)
+                  </p>
+                </div>
+                <div className="flex flex-col gap-1.5 items-end">
+                  <div className="flex items-center gap-2 bg-[#222B35] px-2.5 py-1 rounded-lg text-xs">
+                    <span className="material-symbols-outlined text-[16px] text-blue-400">humidity_mid</span>
+                    <span className="font-mono font-semibold">58% RH</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-[#222B35] px-2.5 py-1 rounded-lg text-xs">
+                    <span className="material-symbols-outlined text-[16px] text-[#14B8A6]">group</span>
+                    <span>2 home</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick 3 Status Indicators */}
+            <div className="grid grid-cols-3 gap-2">
+              <Link to="/devices" className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-3 flex flex-col justify-between hover:border-primary/40">
+                <div className="flex items-center justify-between">
+                  <span className="material-symbols-outlined text-amber-400 text-[20px]">lightbulb</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-[10px] uppercase text-[#8B98A5] block">Lighting</span>
+                  <span className="text-sm font-semibold font-mono block">5 of 12</span>
+                  <span className="text-[10px] text-[#14B8A6]">Active</span>
+                </div>
+              </Link>
+
+              <Link to="/device-detail" className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-3 flex flex-col justify-between hover:border-primary/40">
+                <div className="flex items-center justify-between">
+                  <span className="material-symbols-outlined text-[#14B8A6] text-[20px]">air</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-[10px] uppercase text-[#8B98A5] block">Climate</span>
+                  <span className="text-sm font-semibold font-mono block">AC Cooling</span>
+                  <span className="text-[10px] text-[#8B98A5]">24.0° Set</span>
+                </div>
+              </Link>
+
+              <Link to="/security" className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-3 flex flex-col justify-between hover:border-primary/40">
+                <div className="flex items-center justify-between">
+                  <span className="material-symbols-outlined text-emerald-400 text-[20px]">shield</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-[10px] uppercase text-[#8B98A5] block">Security</span>
+                  <span className="text-sm font-semibold block">Armed</span>
+                  <span className="text-[10px] text-emerald-400">All secure</span>
+                </div>
+              </Link>
+            </div>
+
+            {/* Energy Mini Card with Sparkline */}
+            <Link to="/energy" className="block bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 hover:border-primary/40 transition-colors">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-primary text-[18px]">bolt</span>
+                  <span className="text-xs font-semibold text-[#8B98A5] uppercase tracking-wider">Energy Today</span>
+                </div>
+                <span className="text-xs text-[#14B8A6] bg-[#222B35] px-2 py-0.5 rounded-full font-mono">-12% vs norm</span>
+              </div>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-2xl font-bold font-mono text-[#e8eef4]">3.2</span>
+                <span className="text-xs text-[#8B98A5]">kWh total</span>
+              </div>
+              <div className="w-full h-12">
+                <svg className="w-full h-full" viewBox="0 0 340 60" preserveAspectRatio="none">
+                  <polyline
+                    fill="none"
+                    stroke="#14b8a6"
+                    strokeWidth="2.5"
+                    points="0,48 40,45 80,50 120,40 160,35 200,24 240,28 280,18 320,14 340,16"
+                  />
+                  <circle cx="340" cy="16" r="3" fill="#14b8a6" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* AI Suggestion Card */}
+            {showAiCard && (
+              <div className="bg-[#1A2129] border border-primary/50 rounded-2xl p-4 flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">psychology</span>
+                  <span className="text-xs font-semibold text-primary uppercase tracking-wider">Aware Assist</span>
+                </div>
+                <h3 className="text-sm font-semibold text-[#e8eef4]">Pre-cool living room at 5:30 PM</h3>
+                <p className="text-xs text-[#8B98A5]">Shift compression ahead of peak tariff surge to save ~0.8 kWh.</p>
+                <div className="flex gap-2 pt-1">
+                  <button 
+                    onClick={() => {
+                      alert("Automated schedule applied!");
+                      setShowAiCard(false);
+                    }}
+                    className="flex-1 h-9 rounded-lg bg-primary text-white text-xs font-medium hover:bg-blue-600"
+                  >
+                    Apply Schedule
+                  </button>
+                  <button 
+                    onClick={() => setShowAiCard(false)}
+                    className="h-9 px-3 rounded-lg bg-[#222B35] text-[#8B98A5] text-xs hover:text-[#e8eef4]"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Actions */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#8B98A5]">Quick Controls</span>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { label: "All Off", icon: "light_off", action: () => alert("All non-essential lights turned off") },
+                  { label: "Away Mode", icon: "sensor_door", action: () => setHouseMode("away") },
+                  { label: "Night Mode", icon: "bedtime", action: () => setHouseMode("night") },
+                  { label: "Security", icon: "shield", path: "/security" }
+                ].map((act, i) => (
+                  <button
+                    key={i}
+                    onClick={act.path ? () => navigate(act.path) : act.action}
+                    className="p-2.5 bg-[#1A2129] border border-[#2C3744] rounded-xl flex flex-col items-center gap-1.5 hover:bg-[#222B35] transition-all"
+                  >
+                    <span className="material-symbols-outlined text-[20px] text-primary">{act.icon}</span>
+                    <span className="text-[10px] text-[#8B98A5] truncate w-full text-center">{act.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Web View Switch Banner */}
+            <div className="p-3 bg-[#1A2129] border border-[#2C3744] rounded-xl flex items-center justify-between text-xs">
+              <span className="text-[#8B98A5]">Viewing in Mobile Stack</span>
+              <Link to="/desktop" className="text-primary font-semibold flex items-center gap-1">
+                <span>Open Desktop Dashboard</span>
+                <span className="material-symbols-outlined text-sm">desktop_windows</span>
+              </Link>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 3: DEVICES LIST SCREEN
+    // ==========================================
+    function DevicesScreen() {
+      const navigate = useNavigate();
+      const [filter, setFilter] = useState("all");
+      const [room, setRoom] = useState("all");
+      const [lightLevel1, setLightLevel1] = useState(70);
+      const [lightLevel2, setLightLevel2] = useState(40);
+      const [lightOn1, setLightOn1] = useState(true);
+      const [lightOn2, setLightOn2] = useState(true);
+      const [lockSecure, setLockSecure] = useState(true);
+      const [acTemp, setAcTemp] = useState(24.0);
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24">
+          <Header title="Aware Home" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-[#e8eef4]">Devices</h1>
+                <p className="text-xs text-[#8B98A5] flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span>
+                  <span>8 Connected</span>
+                  <span>•</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                  <span className="text-red-400">1 Offline</span>
+                </p>
+              </div>
+              <button 
+                onClick={() => navigate("/add-device")} 
+                className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-blue-600 shadow"
+                aria-label="Add Device"
+              >
+                <span className="material-symbols-outlined text-[20px]">add</span>
+              </button>
+            </div>
+
+            {/* Category Segment Tabs */}
+            <div className="grid grid-cols-4 bg-[#1A2129] border border-[#2C3744] p-1 rounded-xl text-xs">
+              {["all", "lighting", "climate", "security"].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setFilter(cat)}
+                  className={`py-2 rounded-lg capitalize transition-all ${
+                    filter === cat ? "bg-[#222B35] text-primary font-semibold" : "text-[#8B98A5]"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Room Filter Chips */}
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+              {[
+                { id: "all", label: "All Rooms" },
+                { id: "living", label: "Living Room (3)" },
+                { id: "bedroom", label: "Bedroom (2)" },
+                { id: "hall", label: "Hallway (2)" }
+              ].map(r => (
+                <button
+                  key={r.id}
+                  onClick={() => setRoom(r.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs whitespace-nowrap border transition-all ${
+                    room === r.id 
+                      ? "bg-primary text-white border-primary font-medium" 
+                      : "bg-[#1A2129] text-[#8B98A5] border-[#2C3744]"
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Device 1: Ceiling Luminaire */}
+            {(filter === "all" || filter === "lighting") && (
+              <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                      <span className="material-symbols-outlined text-[22px]">lightbulb</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-semibold text-[#e8eef4]">Ceiling Luminaire</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span>
+                      </div>
+                      <span className="text-xs text-[#8B98A5]">Living Room • 18W</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setLightOn1(!lightOn1)}
+                    className={`w-12 h-7 rounded-full p-0.5 flex items-center transition-colors ${
+                      lightOn1 ? "bg-primary justify-end" : "bg-[#222B35] justify-start"
+                    }`}
+                  >
+                    <span className="w-6 h-6 rounded-full bg-white shadow-sm inline-block"></span>
+                  </button>
+                </div>
+
+                {lightOn1 && (
+                  <div className="space-y-1 pt-1">
+                    <div className="flex justify-between text-xs text-[#8B98A5]">
+                      <span>Brightness Level</span>
+                      <span className="text-primary font-mono font-semibold">{lightLevel1}%</span>
+                    </div>
+                    <input 
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={lightLevel1}
+                      onChange={(e) => setLightLevel1(e.target.value)}
+                      className="w-full accent-primary h-1.5 bg-[#222B35] rounded-lg cursor-pointer"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Device 2: Nordic Desk Lamp */}
+            {(filter === "all" || filter === "lighting") && (
+              <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-[#222B35] flex items-center justify-center text-[#8B98A5]">
+                      <span className="material-symbols-outlined text-[22px]">deskphone</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-semibold text-[#e8eef4]">Nordic Desk Lamp</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span>
+                      </div>
+                      <span className="text-xs text-[#8B98A5]">Reading Corner • 8W</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setLightOn2(!lightOn2)}
+                    className={`w-12 h-7 rounded-full p-0.5 flex items-center transition-colors ${
+                      lightOn2 ? "bg-primary justify-end" : "bg-[#222B35] justify-start"
+                    }`}
+                  >
+                    <span className="w-6 h-6 rounded-full bg-white shadow-sm inline-block"></span>
+                  </button>
+                </div>
+
+                {lightOn2 && (
+                  <div className="space-y-1 pt-1">
+                    <div className="flex justify-between text-xs text-[#8B98A5]">
+                      <span>Warmth & Output</span>
+                      <span className="text-primary font-mono font-semibold">{lightLevel2}%</span>
+                    </div>
+                    <input 
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={lightLevel2}
+                      onChange={(e) => setLightLevel2(e.target.value)}
+                      className="w-full accent-primary h-1.5 bg-[#222B35] rounded-lg cursor-pointer"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Device 3: Smart Inverter AC */}
+            {(filter === "all" || filter === "climate") && (
+              <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Link to="/device-detail" className="w-11 h-11 rounded-xl bg-[#14B8A6]/20 flex items-center justify-center text-[#14B8A6]">
+                      <span className="material-symbols-outlined text-[22px]">thermostat</span>
+                    </Link>
+                    <div>
+                      <Link to="/device-detail" className="text-sm font-semibold text-[#e8eef4] hover:underline">
+                        Smart Inverter AC
+                      </Link>
+                      <div className="text-xs text-[#8B98A5]">Living Climate • Current 25.1°C</div>
+                    </div>
+                  </div>
+                  <Link to="/device-detail" className="text-xs text-[#14B8A6] border border-[#14B8A6]/30 px-2.5 py-1 rounded-full">
+                    Detail Dial &rarr;
+                  </Link>
+                </div>
+
+                <div className="flex items-center justify-between bg-[#222B35] p-2 rounded-xl">
+                  <button 
+                    onClick={() => setAcTemp(Math.max(16, acTemp - 0.5))}
+                    className="w-10 h-10 rounded-lg bg-[#1A2129] text-white flex items-center justify-center text-lg font-bold"
+                  >
+                    -
+                  </button>
+                  <div className="text-center">
+                    <span className="text-2xl font-bold font-mono text-[#14B8A6]">{acTemp.toFixed(1)}°C</span>
+                    <span className="block text-[10px] text-[#8B98A5] uppercase">Target Temp</span>
+                  </div>
+                  <button 
+                    onClick={() => setAcTemp(Math.min(30, acTemp + 0.5))}
+                    className="w-10 h-10 rounded-lg bg-[#1A2129] text-white flex items-center justify-center text-lg font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Device 4: Hallway Smart Lock */}
+            {(filter === "all" || filter === "security") && (
+              <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined text-[22px]">lock</span>
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-[#e8eef4]">Hallway Smart Lock</span>
+                    <p className="text-xs text-primary font-medium flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                      {lockSecure ? "Secured • Battery 92%" : "Unlocked • Warning"}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setLockSecure(!lockSecure)}
+                  className="px-3.5 h-9 rounded-lg bg-[#222B35] text-xs font-semibold text-[#e8eef4] hover:bg-[#2C3744] flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-primary">
+                    {lockSecure ? "lock_open" : "lock"}
+                  </span>
+                  <span>{lockSecure ? "Unlock" : "Lock"}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Offline Device: Smart Plug */}
+            <div className="bg-[#151B22] border border-[#2C3744] rounded-2xl p-4 flex items-center justify-between opacity-80">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-[#222B35] flex items-center justify-center text-[#8B98A5]">
+                  <span className="material-symbols-outlined text-[22px]">power</span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-[#8B98A5]">Kitchen Smart Plug</span>
+                  <p className="text-xs text-red-400">Offline for 2h • Ping timed out</p>
+                </div>
+              </div>
+              <button 
+                onClick={(e) => {
+                  e.currentTarget.innerText = "Reconnected";
+                  alert("Device ping re-established.");
+                }}
+                className="px-3 h-8 rounded-lg bg-[#222B35] text-xs font-medium text-[#e8eef4] hover:bg-[#2C3744]"
+              >
+                Reconnect
+              </button>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 4: DEVICE DETAIL (THERMOSTAT DIAL)
+    // ==========================================
+    function DeviceDetailScreen() {
+      const [targetTemp, setTargetTemp] = useState(24.0);
+      const [isPowerOn, setIsPowerOn] = useState(true);
+      const [mode, setMode] = useState("cool");
+      const [fanSpeed, setFanSpeed] = useState("med");
+
+      return (
+        <div className="flex flex-col min-h-screen pb-20">
+          <Header title="Device Detail" backPath="/devices" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            {/* Hero Card */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]"></span>
+                  <span className="text-[10px] text-[#8B98A5] uppercase tracking-wider font-semibold">Online • Living Room</span>
+                </div>
+                <h2 className="text-lg font-bold text-[#e8eef4]">Climate Master Pro</h2>
+                <span className="text-xs text-[#8B98A5]">Dual Inverter Heat Pump</span>
+              </div>
+              <button 
+                onClick={() => setIsPowerOn(!isPowerOn)}
+                className={`w-14 h-8 rounded-full p-1 flex items-center transition-colors ${
+                  isPowerOn ? "bg-[#14B8A6] justify-end" : "bg-[#222B35] justify-start border border-[#2C3744]"
+                }`}
+              >
+                <div className="w-6 h-6 rounded-full bg-[#0F1419] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[16px] text-[#14B8A6]">power_settings_new</span>
+                </div>
+              </button>
+            </div>
+
+            {/* Dial Thermostat Visualizer */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-6 flex flex-col items-center">
+              <div className="relative w-60 h-60 flex items-center justify-center">
+                <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 220 220">
+                  <circle cx="110" cy="110" fill="none" r="92" stroke="#222B35" strokeDasharray="433 578" strokeLinecap="round" strokeWidth="12"></circle>
+                  <circle 
+                    cx="110" 
+                    cy="110" 
+                    fill="none" 
+                    r="92" 
+                    stroke="#14B8A6" 
+                    strokeDasharray={`${(targetTemp - 16) * 20} 578`} 
+                    strokeLinecap="round" 
+                    strokeWidth="12"
+                  ></circle>
+                </svg>
+
+                <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity ${isPowerOn ? "opacity-100" : "opacity-30"}`}>
+                  <span className="text-[10px] text-[#8B98A5] uppercase tracking-widest font-bold">Target Temp</span>
+                  <div className="flex items-start">
+                    <span className="text-5xl font-bold font-mono tracking-tight text-[#e8eef4]">{targetTemp.toFixed(1)}</span>
+                    <span className="text-xl font-bold text-[#14B8A6] ml-1">°C</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-2 bg-[#222B35] px-3 py-1 rounded-full border border-[#2C3744]">
+                    <span className="material-symbols-outlined text-[#14B8A6] text-[14px]">ac_unit</span>
+                    <span className="text-[10px] text-[#8B98A5] font-semibold uppercase">{isPowerOn ? "Maintaining" : "Off"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Steppers */}
+              <div className="flex items-center justify-center gap-6 w-full mt-2 mb-4">
+                <button 
+                  disabled={!isPowerOn}
+                  onClick={() => setTargetTemp(Math.max(16, targetTemp - 0.5))}
+                  className="w-12 h-12 rounded-xl bg-[#222B35] border border-[#2C3744] flex items-center justify-center text-[#e8eef4] hover:text-[#14B8A6] active:bg-[#2C3744]"
+                >
+                  <span className="material-symbols-outlined text-[24px]">remove</span>
+                </button>
+                <div className="text-center">
+                  <span className="text-xs text-[#8B98A5] block">Step 0.5°C</span>
+                  <span className="text-[10px] text-[#8B98A5] font-mono">16°C – 30°C</span>
+                </div>
+                <button 
+                  disabled={!isPowerOn}
+                  onClick={() => setTargetTemp(Math.min(30, targetTemp + 0.5))}
+                  className="w-12 h-12 rounded-xl bg-[#222B35] border border-[#2C3744] flex items-center justify-center text-[#e8eef4] hover:text-[#14B8A6] active:bg-[#2C3744]"
+                >
+                  <span className="material-symbols-outlined text-[24px]">add</span>
+                </button>
+              </div>
+
+              {/* Status Row */}
+              <div className="w-full pt-4 border-t border-[#2C3744] flex items-center justify-around text-center text-xs">
+                <div>
+                  <span className="text-[#8B98A5] block">Current Room</span>
+                  <span className="text-[#e8eef4] font-mono font-medium text-sm mt-0.5">25.1°C</span>
+                </div>
+                <div className="w-px h-6 bg-[#2C3744]"></div>
+                <div>
+                  <span className="text-[#8B98A5] block">Humidity</span>
+                  <span className="text-[#e8eef4] font-mono font-medium text-sm mt-0.5">48%</span>
+                </div>
+                <div className="w-px h-6 bg-[#2C3744]"></div>
+                <div>
+                  <span className="text-[#8B98A5] block">Outdoor</span>
+                  <span className="text-[#e8eef4] font-mono font-medium text-sm mt-0.5">31.2°C</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mode & Fan Controls */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex flex-col gap-3">
+              <span className="text-[10px] text-[#8B98A5] uppercase font-bold tracking-wider">Mode</span>
+              <div className="grid grid-cols-5 gap-1.5">
+                {[
+                  { id: "cool", label: "Cool", icon: "ac_unit" },
+                  { id: "heat", label: "Heat", icon: "whatshot" },
+                  { id: "fan", label: "Fan", icon: "air" },
+                  { id: "auto", label: "Auto", icon: "hdr_auto" },
+                  { id: "dry", label: "Dry", icon: "water_drop" }
+                ].map(m => (
+                  <button
+                    key={m.id}
+                    onClick={() => setMode(m.id)}
+                    className={`h-11 rounded-lg flex flex-col items-center justify-center text-xs transition-colors ${
+                      mode === m.id ? "bg-[#14B8A6] text-[#0F1419] font-bold" : "bg-[#222B35] text-[#8B98A5] border border-[#2C3744]"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">{m.icon}</span>
+                    <span className="text-[10px] uppercase">{m.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="pt-3 border-t border-[#2C3744] space-y-2">
+                <span className="text-[10px] text-[#8B98A5] uppercase font-bold tracking-wider block">Fan Speed</span>
+                <div className="grid grid-cols-4 gap-2">
+                  {["low", "med", "high", "auto"].map(spd => (
+                    <button
+                      key={spd}
+                      onClick={() => setFanSpeed(spd)}
+                      className={`h-9 rounded-lg text-xs capitalize transition-colors ${
+                        fanSpeed === spd 
+                          ? "bg-[#222B35] border border-[#14B8A6] text-[#14B8A6] font-bold" 
+                          : "bg-[#222B35] border border-[#2C3744] text-[#8B98A5]"
+                      }`}
+                    >
+                      {spd}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Technical Specs */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl overflow-hidden text-xs">
+              <div className="px-4 py-3 bg-[#222B35] border-b border-[#2C3744] flex items-center justify-between font-bold text-[#8B98A5] uppercase">
+                <span>Technical Specifications</span>
+                <span className="material-symbols-outlined text-[16px]">tune</span>
+              </div>
+              <div className="divide-y divide-[#2C3744]">
+                <div className="px-4 py-2.5 flex justify-between">
+                  <span className="text-[#8B98A5]">IP Address</span>
+                  <span className="font-mono text-[#e8eef4]">192.168.1.142</span>
+                </div>
+                <div className="px-4 py-2.5 flex justify-between">
+                  <span className="text-[#8B98A5]">Firmware</span>
+                  <span className="font-mono text-[#e8eef4]">v2.4.1-build88</span>
+                </div>
+                <div className="px-4 py-2.5 flex justify-between">
+                  <span className="text-[#8B98A5]">Protocol</span>
+                  <span className="font-mono text-[#14B8A6]">MQTT (192.168.1.10)</span>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 5: ADD DEVICE (STEPPER / ROOM PICKER)
+    // ==========================================
+    function AddDeviceScreen() {
+      const navigate = useNavigate();
+      const [selectedRoom, setSelectedRoom] = useState("Living Room");
+      const [rooms, setRooms] = useState([
+        { name: "Living Room", count: "3 devices active", icon: "chair" },
+        { name: "Bedroom", count: "2 devices active", icon: "bed" },
+        { name: "Kitchen", count: "1 device active", icon: "kitchen" },
+        { name: "Hallway & Entry", count: "1 device active", icon: "meeting_room" },
+        { name: "Office", count: "0 devices", icon: "desk" }
+      ]);
+
+      const handleAddRoom = () => {
+        const name = prompt("Enter a name for the new room:");
+        if (name && name.trim()) {
+          setRooms([...rooms, { name: name.trim(), count: "0 devices", icon: "sensor_door" }]);
+          setSelectedRoom(name.trim());
+        }
+      };
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24">
+          <Header title="Add Device" backPath="/devices" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            {/* Stepper Header */}
+            <div className="flex items-center justify-between px-2 pt-2 pb-4">
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-7 h-7 rounded-full bg-[#14B8A6] text-white flex items-center justify-center text-xs font-bold">✓</div>
+                <span className="text-[10px] text-[#14B8A6] mt-1">Type</span>
+              </div>
+              <div className="h-0.5 bg-[#14B8A6] flex-1"></div>
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">2</div>
+                <span className="text-[10px] text-primary mt-1 font-semibold">Room</span>
+              </div>
+              <div className="h-0.5 bg-[#2C3744] flex-1"></div>
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-7 h-7 rounded-full bg-[#222B35] text-[#8B98A5] flex items-center justify-center text-xs">3</div>
+                <span className="text-[10px] text-[#8B98A5] mt-1">Connect</span>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-[#e8eef4]">Select device location</h2>
+              <p className="text-xs text-[#8B98A5] mt-1">Choose the room where this device will be installed or create a new one.</p>
+            </div>
+
+            {/* Room Cards Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {rooms.map(r => {
+                const isSelected = selectedRoom === r.name;
+                return (
+                  <div
+                    key={r.name}
+                    onClick={() => setSelectedRoom(r.name)}
+                    className={`p-4 rounded-xl flex flex-col justify-between min-h-[140px] cursor-pointer transition-all border ${
+                      isSelected 
+                        ? "bg-[#1A2129] border-[#14B8A6] ring-2 ring-[#14B8A6]/40" 
+                        : "bg-[#1A2129] border-[#2C3744] hover:border-[#8B98A5]"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#14B8A6]/20 text-[#14B8A6]" : "bg-[#222B35] text-[#8B98A5]"}`}>
+                        <span className="material-symbols-outlined text-[24px]">{r.icon}</span>
+                      </div>
+                      {isSelected && (
+                        <div className="w-5 h-5 rounded-full bg-[#14B8A6] text-[#0F1419] flex items-center justify-center">
+                          <span className="material-symbols-outlined text-[14px] font-bold">check</span>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-[#e8eef4] block">{r.name}</span>
+                      <span className="text-[10px] text-[#8B98A5]">{r.count}</span>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Add Room Button */}
+              <button
+                type="button"
+                onClick={handleAddRoom}
+                className="p-4 rounded-xl border border-dashed border-[#2C3744] hover:border-primary flex flex-col justify-between min-h-[140px] text-left bg-[#151B22]"
+              >
+                <div className="w-10 h-10 rounded-lg bg-[#222B35] text-primary flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[24px]">add</span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-[#e8eef4] block">Add New Room</span>
+                  <span className="text-[10px] text-[#8B98A5]">Custom zone</span>
+                </div>
+              </button>
+            </div>
+
+            {/* Bottom Sticky Action */}
+            <div className="fixed bottom-0 inset-x-0 bg-[#0f1419]/95 backdrop-blur-xl border-t border-[#2C3744] p-4 pb-safe z-40 max-w-lg mx-auto">
+              <button 
+                onClick={() => {
+                  alert(`Assigned to ${selectedRoom}! Device paired.`);
+                  navigate("/devices");
+                }}
+                className="w-full h-12 rounded-xl bg-primary hover:bg-blue-600 text-white font-semibold text-sm flex items-center justify-center gap-2"
+              >
+                <span>Continue to Connect ({selectedRoom})</span>
+                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </button>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 6: AUTOMATION RULES SCREEN
+    // ==========================================
+    function AutomationScreen() {
+      const navigate = useNavigate();
+      const [filter, setFilter] = useState("all");
+      const [rules, setRules] = useState([
+        { id: 1, title: "Lights off when empty", desc: "If no motion for 10 min, turn off Living Room lights", type: "Manual", active: true, info: "Living Room • Radar Motion", triggerTime: "Triggered 14m ago" },
+        { id: 2, title: "Night cooling", desc: "At 11:00 PM, set AC to 26°C", type: "AI learned", active: true, info: "Bedroom Climate Master", triggerTime: "Yesterday • Saved 0.4 kWh" },
+        { id: 3, title: "Auto-arm security", desc: "When everyone leaves, arm security system to Away", type: "Manual", active: true, info: "Whole Home Presence", triggerTime: "Today, 8:45 AM" },
+        { id: 4, title: "Solar excess water heater", desc: "When solar generation > 3.0 kW, run water heat pump", type: "AI learned", active: false, info: "Suspended during grid maintenance", triggerTime: "Inactive" }
+      ]);
+      const [showSuggestion, setShowSuggestion] = useState(true);
+
+      const toggleRule = (id) => {
+        setRules(rules.map(r => r.id === id ? { ...r, active: !r.active } : r));
+      };
+
+      const filteredRules = rules.filter(r => {
+        if (filter === "manual") return r.type === "Manual";
+        if (filter === "ai") return r.type === "AI learned";
+        return true;
+      });
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24">
+          <Header title="Automation" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-[#e8eef4]">Automation</h1>
+                <p className="text-xs text-[#8B98A5]">5 active rules • 1 routine detected</p>
+              </div>
+              <Link 
+                to="/rule-builder"
+                className="h-9 px-3 bg-primary hover:bg-blue-600 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow"
+              >
+                <span className="material-symbols-outlined text-[16px]">add</span>
+                <span>New rule</span>
+              </Link>
+            </div>
+
+            {/* Filter Chips */}
+            <div className="flex gap-2 text-xs">
+              {[
+                { id: "all", label: "All (6)" },
+                { id: "manual", label: "Manual (3)" },
+                { id: "ai", label: "Learned by AI (3)" }
+              ].map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => setFilter(f.id)}
+                  className={`px-3 py-1.5 rounded-full border transition-all ${
+                    filter === f.id 
+                      ? "bg-primary/20 text-primary border-primary font-semibold" 
+                      : "bg-[#1A2129] text-[#8B98A5] border-[#2C3744]"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Detected Routine Card */}
+            {showSuggestion && (
+              <div className="bg-[#1A2129] border border-primary rounded-xl p-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-primary text-xs font-semibold">
+                    <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+                    <span>Detected routine</span>
+                  </div>
+                  <span className="bg-primary text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">New Suggestion</span>
+                </div>
+                <h2 className="text-sm font-semibold text-[#e8eef4]">Weekdays 7:00 AM: bedroom lights on, AC off</h2>
+                <p className="text-xs text-[#8B98A5]">Observed consistently over past 14 days with 94% confidence. Estimated morning comfort optimization.</p>
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  <button 
+                    onClick={() => {
+                      alert("Routine accepted into active queue!");
+                      setShowSuggestion(false);
+                    }}
+                    className="h-8 rounded-lg bg-primary text-white text-xs font-medium"
+                  >
+                    Accept
+                  </button>
+                  <Link 
+                    to="/rule-builder"
+                    className="h-8 rounded-lg bg-[#222B35] text-[#e8eef4] border border-[#2C3744] text-xs font-medium flex items-center justify-center"
+                  >
+                    Edit
+                  </Link>
+                  <button 
+                    onClick={() => setShowSuggestion(false)}
+                    className="h-8 rounded-lg text-[#8B98A5] hover:text-[#e8eef4] text-xs"
+                  >
+                    Ignore
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Active Rules List */}
+            <div className="space-y-3">
+              <span className="text-[10px] uppercase tracking-wider text-[#8B98A5] font-bold">Active Automations</span>
+              {filteredRules.map(rule => (
+                <div key={rule.id} className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-4 flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#222B35] text-[#8B98A5] border border-[#2C3744]">
+                        {rule.type}
+                      </span>
+                      <span className="text-sm font-semibold text-[#e8eef4]">{rule.title}</span>
+                    </div>
+                    <button 
+                      onClick={() => toggleRule(rule.id)}
+                      className={`w-11 h-6 rounded-full p-0.5 flex items-center transition-colors ${
+                        rule.active ? "bg-primary justify-end" : "bg-[#222B35] justify-start border border-[#2C3744]"
+                      }`}
+                    >
+                      <span className="w-5 h-5 rounded-full bg-white shadow-sm inline-block"></span>
+                    </button>
+                  </div>
+                  <p className="text-xs text-[#8B98A5]">{rule.desc}</p>
+                  <div className="flex items-center justify-between pt-1 border-t border-[#2C3744] text-[10px] text-[#8B98A5]">
+                    <span>{rule.info}</span>
+                    <span className="text-[#14B8A6]">{rule.triggerTime}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 7: RULE BUILDER SCREEN
+    // ==========================================
+    function RuleBuilderScreen() {
+      const navigate = useNavigate();
+      const [trigger, setTrigger] = useState("Presence (When everyone leaves)");
+      const [dropdownOpen, setDropdownOpen] = useState(false);
+      const [activeDays, setActiveDays] = useState(["M", "T", "W", "T", "F"]);
+      const [priority, setPriority] = useState("Normal");
+
+      const toggleDay = (day) => {
+        if (activeDays.includes(day)) {
+          setActiveDays(activeDays.filter(d => d !== day));
+        } else {
+          setActiveDays([...activeDays, day]);
+        }
+      };
+
+      return (
+        <div className="flex flex-col min-h-screen pb-28">
+          <Header title="Rule Builder" backPath="/automation" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-[#e8eef4]">Rule Builder</h2>
+              <p className="text-xs text-[#8B98A5]">Define trigger logic, conditions, and resulting actions</p>
+            </div>
+
+            {/* BLOCK 1: IF (Trigger) */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded bg-blue-500/20 text-blue-400 text-xs font-bold uppercase">IF (Trigger)</span>
+                <span className="material-symbols-outlined text-primary text-[20px]">bolt</span>
+              </div>
+
+              <div className="relative">
+                <button 
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="w-full h-11 bg-[#222B35] rounded-lg px-3 flex items-center justify-between text-left border border-[#2C3744] text-xs text-[#e8eef4]"
+                >
+                  <span className="truncate">{trigger}</span>
+                  <span className="material-symbols-outlined text-[18px] text-[#8B98A5]">expand_more</span>
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute top-12 left-0 w-full bg-[#222B35] border border-[#2C3744] rounded-lg p-1 z-30 shadow-xl space-y-1">
+                    {[
+                      "Presence (When everyone leaves)",
+                      "Time Schedule (At specific time)",
+                      "Motion Sensor (Active detection)",
+                      "Temperature Ambient Exceeds 26°C",
+                      "Energy Price (Peak tariff shift)"
+                    ].map(t => (
+                      <button
+                        key={t}
+                        onClick={() => { setTrigger(t); setDropdownOpen(false); }}
+                        className="w-full text-left px-3 py-2 text-xs rounded hover:bg-[#1A2129] text-[#e8eef4]"
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Connector */}
+            <div className="flex justify-center -my-2">
+              <div className="w-6 h-6 rounded-full bg-[#222B35] border border-[#2C3744] flex items-center justify-center text-[#8B98A5]">
+                <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
+              </div>
+            </div>
+
+            {/* BLOCK 2: AND (Condition) */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded bg-[#222B35] text-[#8B98A5] text-xs font-bold uppercase border border-[#2C3744]">AND (Condition)</span>
+                <span className="material-symbols-outlined text-amber-400 text-[20px]">tune</span>
+              </div>
+              <div className="bg-[#222B35] p-3 rounded-lg flex items-center justify-between border border-[#2C3744] text-xs">
+                <div>
+                  <span className="font-semibold block text-[#e8eef4]">Energy price is High</span>
+                  <span className="text-[#8B98A5]">Peak Tariff &gt; ₹9.80/kWh</span>
+                </div>
+                <span className="material-symbols-outlined text-xs text-[#8B98A5]">close</span>
+              </div>
+            </div>
+
+            {/* Connector */}
+            <div className="flex justify-center -my-2">
+              <div className="w-6 h-6 rounded-full bg-[#222B35] border border-[#2C3744] flex items-center justify-center text-[#8B98A5]">
+                <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
+              </div>
+            </div>
+
+            {/* BLOCK 3: THEN (Action) */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded bg-primary text-white text-xs font-bold uppercase">THEN (Action)</span>
+                <span className="material-symbols-outlined text-primary text-[20px]">bolt</span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="bg-[#222B35] p-2.5 rounded-lg flex items-center justify-between border border-[#2C3744]">
+                  <span>Arm security to Away mode</span>
+                  <span className="material-symbols-outlined text-sm text-[#8B98A5]">lock</span>
+                </div>
+                <div className="bg-[#222B35] p-2.5 rounded-lg flex items-center justify-between border border-[#2C3744]">
+                  <span>Set AC to Eco (27°C)</span>
+                  <span className="material-symbols-outlined text-sm text-[#8B98A5]">eco</span>
+                </div>
+                <div className="bg-[#222B35] p-2.5 rounded-lg flex items-center justify-between border border-[#2C3744]">
+                  <span>Send push alert to family members</span>
+                  <span className="material-symbols-outlined text-sm text-[#8B98A5]">notifications</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Schedule Days */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-4 space-y-3">
+              <span className="text-xs font-semibold text-[#e8eef4] block">Active Days</span>
+              <div className="flex justify-between gap-1">
+                {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => {
+                  const active = activeDays.includes(d);
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => toggleDay(d)}
+                      className={`h-10 flex-1 rounded-lg text-xs font-semibold border transition-all ${
+                        active 
+                          ? "bg-primary text-white border-primary" 
+                          : "bg-[#222B35] text-[#8B98A5] border-[#2C3744]"
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Sticky Bottom Actions */}
+            <div className="fixed bottom-0 inset-x-0 bg-[#0f1419]/95 backdrop-blur-xl border-t border-[#2C3744] p-4 pb-safe z-40 max-w-lg mx-auto grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => alert("Simulation test executed successfully!")}
+                className="h-11 rounded-xl bg-[#222B35] border border-[#2C3744] text-[#e8eef4] text-xs font-semibold flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm">play_arrow</span>
+                <span>Test Rule</span>
+              </button>
+              <button 
+                onClick={() => {
+                  alert("Automation rule saved!");
+                  navigate("/automation");
+                }}
+                className="h-11 rounded-xl bg-[#14B8A6] text-[#0F1419] text-xs font-bold flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm">check</span>
+                <span>Save Rule</span>
+              </button>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 8: ENERGY & TARIFF TELEMETRY
+    // ==========================================
+    function EnergyScreen() {
+      const [timeFilter, setTimeFilter] = useState("week");
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24">
+          <Header title="Energy Telemetry" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-[#e8eef4]">Energy</h1>
+                <p className="text-xs text-[#8B98A5] font-mono">Grid: Off-Peak • Real-time load 1.1 kW</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center">
+                <span className="material-symbols-outlined text-[20px]">bolt</span>
+              </div>
+            </div>
+
+            {/* Time Filter Segment */}
+            <div className="grid grid-cols-3 bg-[#1A2129] border border-[#2C3744] p-1 rounded-xl text-xs">
+              {["day", "week", "month"].map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTimeFilter(t)}
+                  className={`py-2 rounded-lg capitalize transition-all ${
+                    timeFilter === t ? "bg-primary text-white font-semibold" : "text-[#8B98A5]"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            {/* Hero Metric Card */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-xs text-[#8B98A5] uppercase tracking-wider block">Total Usage (Past 7 Days)</span>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className="text-4xl font-bold font-mono text-[#e8eef4]">21.4</span>
+                    <span className="text-sm font-semibold text-[#8B98A5]">kWh</span>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-[#14B8A6] text-[#0F1419] text-xs font-bold font-mono flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">trending_down</span>
+                  <span>15% Saved</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-[#2C3744] text-xs">
+                <div>
+                  <span className="text-[#8B98A5]">Est. Spend: </span>
+                  <span className="font-semibold text-[#e8eef4]">₹171 </span>
+                  <span className="text-xs text-[#8B98A5]">(-₹32 vs norm)</span>
+                </div>
+                <span className="text-[#8B98A5] font-mono">Avg 3.05 kWh/d</span>
+              </div>
+            </div>
+
+            {/* SVG Daily Bar Chart */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-[#e8eef4]">Daily Consumption</span>
+                <span className="text-[10px] text-[#8B98A5] font-mono">Actual vs Baseline</span>
+              </div>
+              <div className="w-full h-36 pt-2">
+                <svg className="w-full h-full" viewBox="0 0 320 120" preserveAspectRatio="none">
+                  {/* Grid Lines */}
+                  <line x1="0" y1="30" x2="320" y2="30" stroke="#222B35" strokeDasharray="3 3" />
+                  <line x1="0" y1="70" x2="320" y2="70" stroke="#222B35" strokeDasharray="3 3" />
+                  <line x1="0" y1="110" x2="320" y2="110" stroke="#2C3744" />
+                  {/* Monday to Sunday Bar pairs */}
+                  {[
+                    { x: 12, h: 75, base: 90, val: "3.2", d: "M" },
+                    { x: 56, h: 68, base: 82, val: "2.9", d: "T" },
+                    { x: 102, h: 80, base: 88, val: "3.4", d: "W" },
+                    { x: 148, h: 64, base: 78, val: "2.8", d: "T" },
+                    { x: 194, h: 72, base: 85, val: "3.1", d: "F" },
+                    { x: 240, h: 88, base: 98, val: "3.6", d: "S" },
+                    { x: 286, h: 54, base: 74, val: "2.4", d: "S" }
+                  ].map((bar, i) => (
+                    <g key={i}>
+                      <rect x={bar.x} y={110 - bar.base} width="16" height={bar.base} rx="3" fill="#222B35" />
+                      <rect x={bar.x} y={110 - bar.h} width="16" height={bar.h} rx="3" fill="#0052f2" />
+                      <text x={bar.x + 8} y="118" textAnchor="middle" fill="#8B98A5" fontSize="9">{bar.d}</text>
+                    </g>
+                  ))}
+                </svg>
+              </div>
+            </div>
+
+            {/* Consumption Breakdown Donut Chart */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 space-y-3">
+              <span className="text-sm font-semibold text-[#e8eef4]">Breakdown by Category</span>
+              <div className="flex items-center gap-4">
+                <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
+                  <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#222B35" strokeWidth="12" />
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#0052f2" strokeWidth="12" strokeDasharray="138 238" />
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#14B8A6" strokeWidth="12" strokeDasharray="47 238" strokeDashoffset="-138" />
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#FFB95F" strokeWidth="12" strokeDasharray="35 238" strokeDashoffset="-185" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span className="text-sm font-bold font-mono">58%</span>
+                    <span className="text-[9px] text-[#8B98A5]">HVAC</span>
+                  </div>
+                </div>
+
+                <div className="flex-1 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-[#e8eef4]">
+                      <span className="w-2 h-2 rounded-full bg-primary"></span>
+                      <span>Climate</span>
+                    </span>
+                    <span className="font-mono text-[#8B98A5]">58% • 12.4k</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-[#e8eef4]">
+                      <span className="w-2 h-2 rounded-full bg-[#14B8A6]"></span>
+                      <span>Lighting</span>
+                    </span>
+                    <span className="font-mono text-[#8B98A5]">20% • 4.3k</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-[#e8eef4]">
+                      <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                      <span>Appliances</span>
+                    </span>
+                    <span className="font-mono text-[#8B98A5]">15% • 3.2k</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tariff Ribbon */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="font-semibold text-[#e8eef4]">24-Hour Tariff Forecast</span>
+                <span className="text-[#14B8A6] font-mono">Off-Peak (₹4.20)</span>
+              </div>
+              <div className="w-full h-3 rounded-full flex overflow-hidden">
+                <div className="h-full bg-[#14B8A6]" style={{ width: "25%" }} title="00-06 Off Peak"></div>
+                <div className="h-full bg-amber-500" style={{ width: "45%" }} title="06-17 Normal"></div>
+                <div className="h-full bg-red-500" style={{ width: "15%" }} title="17-21 Peak"></div>
+                <div className="h-full bg-[#14B8A6]" style={{ width: "15%" }} title="21-24 Off Peak"></div>
+              </div>
+              <div className="flex justify-between text-[10px] text-[#8B98A5] font-mono pt-1">
+                <span>00:00</span>
+                <span>06:00</span>
+                <span>12:00</span>
+                <span>18:00</span>
+                <span>24:00</span>
+              </div>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 9: SECURITY (NORMAL ARMED STATE)
+    // ==========================================
+    function SecurityScreen() {
+      const navigate = useNavigate();
+      const [secMode, setSecMode] = useState("home");
+      const [isArmed, setIsArmed] = useState(true);
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24">
+          <Header title="Perimeter Security" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-[#e8eef4]">Security</h1>
+                <p className="text-xs text-[#8B98A5]">Perimeter Monitoring Active • All Nodes Nominal</p>
+              </div>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Secure</span>
+              </span>
+            </div>
+
+            {/* Mode Selector */}
+            <div className="grid grid-cols-3 bg-[#1A2129] border border-[#2C3744] p-1 rounded-xl text-xs">
+              {[
+                { id: "home", label: "Home", icon: "shield" },
+                { id: "away", label: "Away", icon: "flight" },
+                { id: "disarm", label: "Disarmed", icon: "lock_open" }
+              ].map(m => (
+                <button
+                  key={m.id}
+                  onClick={() => {
+                    setSecMode(m.id);
+                    if (m.id === "disarm") setIsArmed(false);
+                    else setIsArmed(true);
+                  }}
+                  className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                    secMode === m.id ? "bg-[#222B35] text-primary font-bold shadow" : "text-[#8B98A5]"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[16px]">{m.icon}</span>
+                  <span>{m.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Hero Card */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex flex-col gap-3">
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[26px]">verified_user</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#8B98A5] uppercase font-bold tracking-wider">System Status</span>
+                  <h2 className="text-lg font-bold text-[#e8eef4]">Armed: {secMode.toUpperCase()}</h2>
+                  <p className="text-xs text-[#8B98A5]">Interior motion sensor active in entry zone only • Perimeter armed</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-[#2C3744]">
+                <button 
+                  onClick={() => setIsArmed(!isArmed)}
+                  className="flex items-center gap-2 text-xs text-[#e8eef4]"
+                >
+                  <div className={`w-10 h-6 rounded-full p-0.5 flex items-center transition-colors ${
+                    isArmed ? "bg-primary justify-end" : "bg-[#222B35] justify-start"
+                  }`}>
+                    <span className="w-5 h-5 rounded-full bg-white shadow-sm inline-block"></span>
+                  </div>
+                  <span>{isArmed ? "Armed" : "Disarmed"}</span>
+                </button>
+
+                {/* Simulation Trigger to Screen 10 (Alert Mode) */}
+                <button 
+                  onClick={() => navigate("/security/alert")}
+                  className="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/40 text-xs font-semibold hover:bg-red-500/30 flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">crisis_alert</span>
+                  <span>Simulate Intrusion</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 4 Sensor Zones Grid */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[10px] uppercase font-bold text-[#8B98A5] tracking-wider">Monitored Zones</span>
+                <span className="text-emerald-400 text-xs font-mono font-semibold">4 / 4 Secured</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { name: "Front Door", state: "Closed", type: "Contact • Batt 94%", icon: "door_front" },
+                  { name: "Window Bay", state: "Closed", type: "Vibration • Secure", icon: "window" },
+                  { name: "Hall Motion", state: "Clear", type: "PIR • Idle 42m", icon: "motion_sensor_active" },
+                  { name: "Smart Lock", state: "Locked", type: "Deadbolt Engaged", icon: "lock" }
+                ].map((s, i) => (
+                  <div key={i} className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-3 flex flex-col justify-between h-28">
+                    <div className="flex items-start justify-between">
+                      <span className="material-symbols-outlined text-emerald-400 text-[20px]">{s.icon}</span>
+                      <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono font-bold">
+                        {s.state}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-[#e8eef4] block truncate">{s.name}</span>
+                      <span className="text-[10px] text-[#8B98A5] block truncate">{s.type}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Event Log */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span>Security Event Log</span>
+                <span className="text-primary text-[10px]">All Events</span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-start gap-2.5 pb-2 border-b border-[#2C3744]">
+                  <span className="material-symbols-outlined text-[18px] text-blue-400 mt-0.5">verified_user</span>
+                  <div className="flex-1">
+                    <span className="font-semibold block text-[#e8eef4]">System armed to Home mode</span>
+                    <span className="text-[10px] text-[#8B98A5]">Scheduled routine • 11:00 PM</span>
+                  </div>
+                  <span className="text-[10px] text-[#8B98A5]">Info</span>
+                </div>
+                <div className="flex items-start gap-2.5 pb-2 border-b border-[#2C3744]">
+                  <span className="material-symbols-outlined text-[18px] text-blue-400 mt-0.5">lock</span>
+                  <div className="flex-1">
+                    <span className="font-semibold block text-[#e8eef4]">Front Door auto-locked</span>
+                    <span className="text-[10px] text-[#8B98A5]">5m timeout • 10:45 PM</span>
+                  </div>
+                  <span className="text-[10px] text-[#8B98A5]">Info</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-[18px] text-amber-400 mt-0.5">warning</span>
+                  <div className="flex-1">
+                    <span className="font-semibold block text-[#e8eef4]">Back Patio sensor low battery</span>
+                    <span className="text-[10px] text-[#8B98A5]">Battery 14% • 06:12 PM</span>
+                  </div>
+                  <span className="text-[10px] text-amber-400">Warning</span>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 10: SECURITY CRITICAL ALERT STATE
+    // ==========================================
+    function SecurityAlertScreen() {
+      const navigate = useNavigate();
+      const [countdown, setCountdown] = useState(15);
+
+      useEffect(() => {
+        if (countdown > 0) {
+          const t = setTimeout(() => setCountdown(countdown - 1), 1000);
+          return () => clearTimeout(t);
+        }
+      }, [countdown]);
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24 bg-[#0f1419]">
+          <Header title="Security Incident" backPath="/security" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            {/* Red Alert Banner */}
+            <div className="bg-red-600 rounded-2xl p-4 text-white shadow-2xl space-y-3">
+              <div className="flex items-start gap-3">
+                <span className="material-symbols-outlined text-3xl animate-bounce">e911_emergency</span>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm">Motion detected in Hall at 02:14</span>
+                    <span className="bg-black/40 px-2 py-0.5 rounded text-[10px] font-bold">LIVE</span>
+                  </div>
+                  <p className="text-xs text-white/90 mt-1">
+                    Perimeter breached while Armed: Home. Siren active ({countdown > 0 ? `${countdown}s` : "Active Now"}).
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button 
+                  onClick={() => alert("Connecting to interior camera livestream...")}
+                  className="h-9 rounded-lg bg-white text-red-600 font-bold text-xs flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">videocam</span>
+                  <span>View Camera</span>
+                </button>
+                <button 
+                  onClick={() => navigate("/security")}
+                  className="h-9 rounded-lg bg-black/30 hover:bg-black/40 text-white font-semibold text-xs flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">close</span>
+                  <span>Dismiss</span>
+                </button>
+              </div>
+
+              <a 
+                href="tel:911"
+                className="w-full h-10 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center gap-1.5 text-white font-bold text-xs"
+              >
+                <span className="material-symbols-outlined text-[18px]">emergency_home</span>
+                <span>Call Emergency Contact</span>
+              </a>
+            </div>
+
+            {/* Alert Status Card */}
+            <div className="bg-[#1A2129] border-2 border-red-500 rounded-2xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-red-500/20 text-red-500 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-3xl animate-pulse">shield_with_heart</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-red-400 uppercase font-bold tracking-wider">SYSTEM STATUS</span>
+                  <h2 className="text-xl font-bold text-red-500">Intrusion Alert</h2>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  alert("Security passcode verified. System disarmed.");
+                  navigate("/security");
+                }}
+                className="px-4 py-2 bg-[#222B35] border border-red-500/50 rounded-xl text-xs font-bold text-[#e8eef4] hover:bg-[#2C3744]"
+              >
+                Disarm System
+              </button>
+            </div>
+
+            {/* Camera Frame Capture */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs">
+                <span className="font-semibold text-[#e8eef4]">Incident Camera Capture</span>
+                <span className="text-red-400 font-mono text-[10px] font-bold">REC 02:14:08 AM</span>
+              </div>
+              <div className="w-full h-44 rounded-xl overflow-hidden relative border border-red-500/40 bg-[#1A2129]">
+                <img 
+                  src="https://images.unsplash.com/photo-1558036117-15d82a90b9b1?auto=format&fit=crop&w=600&q=80" 
+                  alt="Security Hallway Night Vision Capture"
+                  className="w-full h-full object-cover filter contrast-125 brightness-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-xs">
+                  <span className="bg-black/60 px-2 py-0.5 rounded text-[10px] text-white font-mono">CAM-02 • HALLWAY</span>
+                  <span className="text-[10px] text-red-400 font-bold uppercase tracking-wider">Motion Flagged</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Triggered Sensor Tile */}
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-red-500 text-2xl animate-pulse">motion_sensor_active</span>
+                <div>
+                  <span className="text-sm font-bold text-red-400">Hallway Motion Radar</span>
+                  <span className="text-xs text-[#8B98A5] block">Threshold 82% exceeded</span>
+                </div>
+              </div>
+              <span className="px-2 py-1 bg-red-500 text-white rounded text-[10px] font-bold uppercase font-mono">Active</span>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 11: SETTINGS & PREFERENCES
+    // ==========================================
+    function SettingsScreen() {
+      const navigate = useNavigate();
+      const [strictLocal, setStrictLocal] = useState(true);
+      const [criticalAlerts, setCriticalAlerts] = useState(true);
+      const [aiSavingsAlert, setAiSavingsAlert] = useState(true);
+      const [tempUnit, setTempUnit] = useState("C");
+
+      return (
+        <div className="flex flex-col min-h-screen pb-24">
+          <Header title="Settings" />
+          <main className="pt-20 px-4 space-y-4 max-w-lg mx-auto w-full">
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-[#e8eef4]">Settings</h1>
+              <p className="text-xs text-[#8B98A5]">System configuration & preferences</p>
+            </div>
+
+            {/* Profile Card */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base">
+                  AS
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-semibold text-sm text-[#e8eef4]">Ayush Sharma</span>
+                    <span className="material-symbols-outlined text-xs text-primary">verified</span>
+                  </div>
+                  <span className="text-xs text-[#8B98A5]">ayush@oakridge.home</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between bg-[#222B35] px-3 py-2 rounded-xl text-xs">
+                <div className="flex items-center gap-1.5 text-[#e8eef4]">
+                  <span className="material-symbols-outlined text-primary text-[16px]">shield_person</span>
+                  <span>Oakridge Residence • Admin</span>
+                </div>
+                <span className="text-primary font-bold uppercase text-[10px] cursor-pointer">Edit</span>
+              </div>
+            </div>
+
+            {/* Link Telemetry Status Cards */}
+            <div className="space-y-2">
+              <span className="text-[10px] uppercase font-bold text-[#8B98A5] tracking-wider">Link Telemetry</span>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-3">
+                  <div className="flex justify-between text-[#8B98A5]">
+                    <span>MQTT Broker</span>
+                    <span className="w-2 h-2 rounded-full bg-[#14B8A6]"></span>
+                  </div>
+                  <span className="text-sm font-semibold text-[#e8eef4] block mt-1">Connected</span>
+                  <span className="text-[10px] text-[#8B98A5]">Latency: 42 ms</span>
+                </div>
+
+                <div className="bg-[#1A2129] border border-[#2C3744] rounded-xl p-3">
+                  <div className="flex justify-between text-[#8B98A5]">
+                    <span>Local Aware Hub</span>
+                    <span className="w-2 h-2 rounded-full bg-[#14B8A6]"></span>
+                  </div>
+                  <span className="text-sm font-semibold text-[#e8eef4] block mt-1">v2.4.1 Stable</span>
+                  <span className="text-[10px] text-[#8B98A5]">Zero packet loss</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Notification Toggles */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl divide-y divide-[#2C3744] text-xs">
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="font-semibold block text-[#e8eef4]">Critical Security Alerts</span>
+                  <span className="text-[10px] text-[#8B98A5]">Push notification on intrusion breaches</span>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={criticalAlerts} 
+                  onChange={() => setCriticalAlerts(!criticalAlerts)}
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                />
+              </div>
+
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="font-semibold block text-[#e8eef4]">AI Energy Savings Advice</span>
+                  <span className="text-[10px] text-[#8B98A5]">Contextual thermal and load shedding alerts</span>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={aiSavingsAlert} 
+                  onChange={() => setAiSavingsAlert(!aiSavingsAlert)}
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                />
+              </div>
+
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="font-semibold block text-[#e8eef4]">Strict Local Hub Processing</span>
+                  <span className="text-[10px] text-[#8B98A5]">Telemetry never leaves home perimeter</span>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={strictLocal} 
+                  onChange={() => setStrictLocal(!strictLocal)}
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Unit Preferences */}
+            <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-4 flex items-center justify-between text-xs">
+              <div>
+                <span className="font-semibold block text-[#e8eef4]">Temperature Metric</span>
+                <span className="text-[10px] text-[#8B98A5]">Sensory display scale</span>
+              </div>
+              <div className="flex bg-[#222B35] rounded-lg p-1 border border-[#2C3744]">
+                <button 
+                  onClick={() => setTempUnit("C")}
+                  className={`px-3 py-1 rounded text-xs font-semibold ${tempUnit === "C" ? "bg-primary text-white" : "text-[#8B98A5]"}`}
+                >
+                  °C
+                </button>
+                <button 
+                  onClick={() => setTempUnit("F")}
+                  className={`px-3 py-1 rounded text-xs font-semibold ${tempUnit === "F" ? "bg-primary text-white" : "text-[#8B98A5]"}`}
+                >
+                  °F
+                </button>
+              </div>
+            </div>
+
+            {/* Logout / Dangerous */}
+            <button 
+              onClick={() => navigate("/login")}
+              className="w-full h-11 bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-400 font-semibold rounded-xl text-xs flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-[18px]">logout</span>
+              <span>Sign Out from Oakridge Residence</span>
+            </button>
+          </main>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // SCREEN 12: DESKTOP MULTI-COLUMN TELEMETRY DASHBOARD
+    // ==========================================
+    function DesktopDashboardScreen() {
+      const navigate = useNavigate();
+      const [deskMode, setDeskMode] = useState("home");
+      const [temp, setTemp] = useState(24.5);
+
+      return (
+        <div className="min-h-screen bg-[#0f1419] text-[#e8eef4] flex">
+          {/* Left Desktop Sidebar */}
+          <aside className="w-64 border-r border-[#2C3744] bg-[#151B22] flex flex-col justify-between p-4 shrink-0 hidden md:flex">
+            <div className="space-y-6">
+              <div className="flex items-center gap-2.5 px-2">
+                <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white">
+                  <span className="material-symbols-outlined text-[22px]">sensors</span>
+                </div>
+                <div>
+                  <span className="font-bold text-sm tracking-tight block">AWARE HOME</span>
+                  <span className="text-[10px] text-[#8B98A5] uppercase tracking-wider font-mono">Instrument OS</span>
+                </div>
+              </div>
+
+              <nav className="space-y-1 text-xs">
+                {[
+                  { label: "Dashboard", icon: "dashboard", path: "/desktop", active: true },
+                  { label: "Mobile Stack", icon: "smartphone", path: "/" },
+                  { label: "Devices Matrix", icon: "devices", path: "/devices" },
+                  { label: "Automation Rules", icon: "hdr_auto", path: "/automation" },
+                  { label: "Energy Telemetry", icon: "bolt", path: "/energy" },
+                  { label: "Security Console", icon: "shield", path: "/security" },
+                  { label: "System Config", icon: "tune", path: "/settings" }
+                ].map(item => (
+                  <Link
+                    key={item.label}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
+                      item.active ? "bg-primary text-white font-semibold" : "text-[#8B98A5] hover:text-[#e8eef4] hover:bg-[#222B35]"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div className="p-3 bg-[#1A2129] border border-[#2C3744] rounded-xl flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">AS</div>
+                <div className="truncate">
+                  <span className="font-medium block truncate text-[#e8eef4]">Master Unit</span>
+                  <span className="text-[10px] text-[#14B8A6] flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span> Online
+                  </span>
+                </div>
+              </div>
+              <Link to="/settings" className="material-symbols-outlined text-[18px] text-[#8B98A5] hover:text-[#e8eef4]">settings</Link>
+            </div>
+          </aside>
+
+          {/* Main Desktop Dashboard */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Top Bar */}
+            <header className="h-16 border-b border-[#2C3744] bg-[#0f1419]/90 px-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xs bg-[#222B35] text-[#8B98A5] px-2.5 py-1 rounded-full font-mono">
+                  HUB 01 // SECTOR A • OAKRIDGE
+                </span>
+                <span className="text-xs text-[#14B8A6] flex items-center gap-1 font-mono">
+                  <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse"></span>
+                  12 Active Nodes
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link to="/" className="text-xs text-primary border border-primary px-3 py-1.5 rounded-lg flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">arrow_back</span>
+                  <span>Mobile View</span>
+                </Link>
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
+                  AS
+                </div>
+              </div>
+            </header>
+
+            {/* Dashboard Content: 3 Column Telemetry Grid */}
+            <main className="p-6 space-y-6 overflow-y-auto">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold tracking-tight text-[#e8eef4]">Good evening, Ayush</h1>
+                  <p className="text-xs text-[#8B98A5]">Telemetry Live • 42ms MQTT mesh latency</p>
+                </div>
+                <div className="flex items-center gap-1 bg-[#1A2129] border border-[#2C3744] p-1 rounded-xl text-xs">
+                  {["home", "away", "night", "auto"].map(m => (
+                    <button
+                      key={m}
+                      onClick={() => setDeskMode(m)}
+                      className={`px-3 py-1.5 rounded-lg capitalize transition-all ${
+                        deskMode === m ? "bg-primary text-white font-semibold" : "text-[#8B98A5]"
+                      }`}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3-Column Instruments */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Column 1: Climate & Sensors */}
+                <div className="space-y-6">
+                  <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-5 space-y-4">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-semibold uppercase tracking-wider text-[#8B98A5]">Indoor Climate Matrix</span>
+                      <span className="text-[#14B8A6] font-mono">Loop Active</span>
+                    </div>
+                    <div className="flex justify-between items-baseline">
+                      <div>
+                        <div className="text-5xl font-bold font-mono text-[#e8eef4]">{temp.toFixed(1)}°C</div>
+                        <span className="text-xs text-[#14B8A6] mt-1 block">Comfort Target Optimal</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => setTemp(temp - 0.5)}
+                          className="w-9 h-9 rounded-lg bg-[#222B35] text-white flex items-center justify-center font-bold"
+                        >
+                          -
+                        </button>
+                        <button 
+                          onClick={() => setTemp(temp + 0.5)}
+                          className="w-9 h-9 rounded-lg bg-[#222B35] text-white flex items-center justify-center font-bold"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 bg-[#222B35] p-3 rounded-xl text-xs text-center font-mono">
+                      <div>
+                        <span className="text-[10px] text-[#8B98A5] uppercase block">Outdoor</span>
+                        <span className="font-bold">31.0°C</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-[#8B98A5] uppercase block">Humidity</span>
+                        <span className="font-bold">58% RH</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-[#8B98A5] uppercase block">Occupancy</span>
+                        <span className="font-bold">2 Home</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Security Instrument */}
+                  <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-5 space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-semibold uppercase tracking-wider text-[#8B98A5]">Perimeter Security</span>
+                      <span className="text-emerald-400 font-mono">ARMED: HOME</span>
+                    </div>
+                    <div className="space-y-2 text-xs">
+                      {["Front Door (Closed)", "Living Casement (Closed)", "Hall PIR (Clear)", "Master Deadbolt (Locked)"].map((z, idx) => (
+                        <div key={idx} className="flex justify-between p-2 bg-[#222B35] rounded-lg">
+                          <span>{z}</span>
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1"></span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2: Load Histogram & AI */}
+                <div className="space-y-6">
+                  <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-5 space-y-3">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-semibold uppercase tracking-wider text-[#8B98A5]">Daily Load Telemetry</span>
+                      <span className="text-primary font-mono">Instant: 480W</span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold font-mono">3.2</span>
+                      <span className="text-sm text-[#8B98A5]">kWh total</span>
+                    </div>
+                    {/* Histogram bars */}
+                    <div className="h-32 flex items-end gap-1.5 pt-4">
+                      {[30, 25, 20, 40, 65, 45, 40, 55, 78, 92, 85, 20].map((h, i) => (
+                        <div key={i} className="flex-1 bg-[#222B35] hover:bg-primary rounded-t transition-all" style={{ height: `${h}%` }}></div>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-[#8B98A5] font-mono">
+                      <span>00:00</span>
+                      <span>06:00</span>
+                      <span>12:00</span>
+                      <span>18:00</span>
+                      <span>Now</span>
+                    </div>
+                  </div>
+
+                  {/* Aware Assist */}
+                  <div className="bg-[#1A2129] border border-primary/50 rounded-2xl p-5 space-y-2">
+                    <div className="flex items-center gap-1.5 text-primary text-xs font-bold uppercase">
+                      <span className="material-symbols-outlined text-[16px]">psychology</span>
+                      <span>Aware Assist Model</span>
+                    </div>
+                    <h3 className="text-sm font-bold text-[#e8eef4]">Pre-cool living room at 5:30 PM</h3>
+                    <p className="text-xs text-[#8B98A5]">Shift compression ahead of peak tariff surge to avoid expensive kilowatt-hour rates. Estimated savings: ~0.8 kWh.</p>
+                    <button 
+                      onClick={() => alert("Schedule dispatched to thermostat.")}
+                      className="mt-2 h-9 px-4 bg-primary text-white text-xs font-semibold rounded-lg hover:bg-blue-600"
+                    >
+                      Apply Schedule
+                    </button>
+                  </div>
+                </div>
+
+                {/* Column 3: Telemetry Stream & Subsystems */}
+                <div className="space-y-6">
+                  <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-5 space-y-3">
+                    <span className="font-semibold uppercase tracking-wider text-[#8B98A5] text-xs">Subsystem Status</span>
+                    <div className="space-y-2 text-xs">
+                      <div className="p-3 bg-[#222B35] rounded-xl flex justify-between">
+                        <div>
+                          <span className="font-semibold block text-[#e8eef4]">Lighting Array</span>
+                          <span className="text-[10px] text-[#8B98A5]">5 fixtures active</span>
+                        </div>
+                        <span className="text-primary font-mono">Online</span>
+                      </div>
+                      <div className="p-3 bg-[#222B35] rounded-xl flex justify-between">
+                        <div>
+                          <span className="font-semibold block text-[#e8eef4]">Climate Compressor</span>
+                          <span className="text-[10px] text-[#8B98A5]">Stage 1 Eco cooling</span>
+                        </div>
+                        <span className="text-[#14B8A6] font-mono">24.0°C</span>
+                      </div>
+                      <div className="p-3 bg-[#222B35] rounded-xl flex justify-between">
+                        <div>
+                          <span className="font-semibold block text-[#e8eef4]">Mesh Bus</span>
+                          <span className="text-[10px] text-[#8B98A5]">8 Online • 1 Ping Timed Out</span>
+                        </div>
+                        <span className="text-amber-400 font-mono">Warning</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Activity stream */}
+                  <div className="bg-[#1A2129] border border-[#2C3744] rounded-2xl p-5 space-y-3 text-xs">
+                    <span className="font-semibold uppercase tracking-wider text-[#8B98A5] text-xs">Live Telemetry Events</span>
+                    <div className="space-y-2.5">
+                      <div className="flex gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></span>
+                        <div className="flex-1">
+                          <span className="block text-[#e8eef4]">Front door locked automatically</span>
+                          <span className="text-[10px] text-[#8B98A5]">12m ago</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6] mt-1.5"></span>
+                        <div className="flex-1">
+                          <span className="block text-[#e8eef4]">Eco mode activated for HVAC</span>
+                          <span className="text-[10px] text-[#8B98A5]">34m ago</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5"></span>
+                        <div className="flex-1">
+                          <span className="block text-[#e8eef4]">Kitchen Smart Plug ping timeout</span>
+                          <span className="text-[10px] text-[#8B98A5]">2h ago</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // ROOT APP COMPONENT WITH MEMORYROUTER
+    // ==========================================
+    function App() {
+      return (
+        <MemoryRouter initialEntries={["/"]}>
+          <div className="flex flex-col min-h-screen bg-[#0f1419] text-[#e8eef4]">
+            <Routes>
+              {/* Screen 1: Home Dashboard */}
+              <Route path="/" element={<HomeScreen />} />
+              {/* Screen 2: Login */}
+              <Route path="/login" element={<LoginPage />} />
+              {/* Screen 3: Devices List */}
+              <Route path="/devices" element={<DevicesScreen />} />
+              {/* Screen 4: Device Detail Dial */}
+              <Route path="/device-detail" element={<DeviceDetailScreen />} />
+              {/* Screen 5: Add Device / Room Picker */}
+              <Route path="/add-device" element={<AddDeviceScreen />} />
+              {/* Screen 6: Automation Rules */}
+              <Route path="/automation" element={<AutomationScreen />} />
+              {/* Screen 7: Rule Builder */}
+              <Route path="/rule-builder" element={<RuleBuilderScreen />} />
+              {/* Screen 8: Energy Telemetry */}
+              <Route path="/energy" element={<EnergyScreen />} />
+              {/* Screen 9: Security Console */}
+              <Route path="/security" element={<SecurityScreen />} />
+              {/* Screen 10: Security Critical Alert */}
+              <Route path="/security/alert" element={<SecurityAlertScreen />} />
+              {/* Screen 11: Settings */}
+              <Route path="/settings" element={<SettingsScreen />} />
+              {/* Screen 12: Desktop Telemetry Dashboard */}
+              <Route path="/desktop" element={<DesktopDashboardScreen />} />
+            </Routes>
+            <BottomNav />
+          </div>
+        </MemoryRouter>
+      );
+    }
+
+    const root = createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Aware Home",
+  "description": "Context-Aware Smart Home OS for climate monitoring, device control, automation rules, energy optimization, and perimeter security.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

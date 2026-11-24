@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Gellix:wght@400;500;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-surface": "#181c1f", error: "#ba1a1a", primary: "#003ebc", "secondary-container": "#acbffd", "surface-container-low": "#f1f4f8", "surface-container-high": "#e5e8ec", "on-primary-container": "#d9deff", "error-container": "#ffdad6", "on-error-container": "#93000a", "surface-variant": "#e0e3e7", background: "#f7f9fe", "primary-container": "#0052f2", "surface-dim": "#d7dade", "tertiary-container": "#3e56d4", "surface-tint": "#004ee7", surface: "#f7f9fe", outline: "#737687", "primary-fixed-dim": "#b6c4ff", "on-secondary": "#ffffff", "on-tertiary-fixed": "#00105b", "on-background": "#181c1f", "on-tertiary-fixed-variant": "#1936b7", "on-surface-variant": "#434656", secondary: "#495c93", "secondary-fixed": "#dbe1ff", "surface-container-highest": "#e0e3e7", "on-tertiary-container": "#dbdeff", "on-secondary-fixed": "#001849", tertiary: "#203bbb", "surface-container": "#ebeef2", "on-primary": "#ffffff", "inverse-on-surface": "#eef1f5", "primary-fixed": "#dce1ff", "surface-bright": "#f7f9fe", "on-tertiary": "#ffffff", "on-secondary-container": "#394d83", "on-secondary-fixed-variant": "#31447a", "secondary-fixed-dim": "#b3c5ff", "outline-variant": "#c3c5d9", "tertiary-fixed": "#dee0ff", "tertiary-fixed-dim": "#bac3ff", "on-error": "#ffffff", "on-primary-fixed": "#001550", "surface-container-lowest": "#ffffff", "on-primary-fixed-variant": "#003ab2", "inverse-surface": "#2d3134", "inverse-primary": "#b6c4ff", "blue-on-black": "#4083FF", red: "#F23845", pink: "#FF7D78", violet: "#A373FF"}, borderRadius: {DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem"}, spacing: {gutter: "1rem", "space-sm": "0.5rem", margin: "1.5rem", "margin-tablet": "1.5rem", "space-xs": "0.25rem", "margin-desktop": "2rem", "gutter-lg": "1.5rem", "gutter-sm": "0.75rem", "space-xl": "2rem", "space-md": "1rem", "space-lg": "1.5rem"}, fontFamily: {"body-default": ["Inter"], "headline-lg": ["Inter"], "display-metric-sm": ["Inter"], "headline-sm": ["Inter"], "label-micro": ["Inter"], "label-caption": ["Inter"], "title-card": ["Inter"], "body-medium": ["Inter"], "display-metric": ["Inter"], "title-xl": ["Gellix"], "eyebrow-s": ["Gellix"], "text-l": ["Gellix"], "text-s": ["Gellix"], "title-xs": ["Gellix"], "text-m": ["Gellix"], "title-xxl-mobile": ["Gellix"], "title-m-mobile": ["Gellix"], "text-xl": ["Gellix"], "title-l-mobile": ["Gellix"], "eyebrow-m": ["Gellix"], "text-xs": ["Gellix"], "title-l": ["Gellix"], "title-m": ["Gellix"], "title-xl-mobile": ["Gellix"], "text-xxs": ["Gellix"], "title-xxl": ["Gellix"], "title-s": ["Gellix"]}, fontSize: {"body-default": ["14px", {lineHeight: "20px", fontWeight: "400"}], "headline-lg": ["24px", {lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "600"}], "display-metric-sm": ["32px", {lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "600"}], "headline-sm": ["18px", {lineHeight: "24px", letterSpacing: "-0.01em", fontWeight: "600"}], "label-micro": ["10px", {lineHeight: "14px", letterSpacing: "0.04em", fontWeight: "600"}], "label-caption": ["12px", {lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "500"}], "title-card": ["16px", {lineHeight: "22px", letterSpacing: "-0.005em", fontWeight: "500"}], "body-medium": ["14px", {lineHeight: "20px", fontWeight: "500"}], "display-metric": ["40px", {lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "600"}], "title-xl": ["56px", {lineHeight: "62px", fontWeight: "600"}], "eyebrow-s": ["12px", {lineHeight: "1.2", fontWeight: "600"}], "text-l": ["18px", {lineHeight: "24px", fontWeight: "400"}], "text-s": ["14px", {lineHeight: "19px", fontWeight: "500"}], "title-xs": ["22px", {lineHeight: "24px", fontWeight: "500"}], "text-m": ["16px", {lineHeight: "22px", fontWeight: "400"}], "title-xxl-mobile": ["40px", {lineHeight: "44px", fontWeight: "700"}], "title-m-mobile": ["28px", {lineHeight: "32px", fontWeight: "600"}], "text-xl": ["20px", {lineHeight: "27px", fontWeight: "400"}], "title-l-mobile": ["32px", {lineHeight: "36px", fontWeight: "600"}], "eyebrow-m": ["14px", {lineHeight: "1.2", fontWeight: "600"}], "text-xs": ["12px", {lineHeight: "16px", fontWeight: "500"}], "title-l": ["44px", {lineHeight: "48px", fontWeight: "600"}], "title-m": ["36px", {lineHeight: "40px", fontWeight: "600"}], "title-xl-mobile": ["36px", {lineHeight: "40px", fontWeight: "600"}], "text-xxs": ["10px", {lineHeight: "13px", fontWeight: "600"}], "title-xxl": ["64px", {lineHeight: "70px", fontWeight: "700"}], "title-s": ["28px", {lineHeight: "31px", fontWeight: "600"}]}}}}</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-default text-body-default text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">Aware Home</span><div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-high"><span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span><span class="font-label-micro text-label-micro text-on-surface-variant uppercase tracking-wider">Live</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Profile" class="w-12 h-12 flex items-center justify-center"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full pb-16">
+<!-- Top Meta / Title Section (Shell provides fixed top header, this anchors the Devices view) -->
+<div class="px-margin pt-space-sm pb-space-sm flex items-center justify-between">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Devices</h1>
+<p class="font-label-caption text-label-caption text-on-surface-variant flex items-center gap-1.5 mt-0.5">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span>8 Connected</span>
+<span class="text-outline-variant">•</span>
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="text-error">1 Offline</span>
+</p>
+</div>
+<button aria-label="Add device quick trigger" class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-on-surface active:scale-95 transition-transform" onclick="triggerDeviceAddModal()">
+<span class="material-symbols-outlined text-[22px]">add</span>
+</button>
+</div>
+<!-- Category Filter Segmented Tabs -->
+<div class="px-margin pt-space-xs pb-space-xs">
+<div class="grid grid-cols-4 p-1 rounded-xl bg-surface-container gap-1" role="tablist">
+<button aria-selected="true" class="h-10 rounded-lg bg-surface-container-high text-primary font-body-medium text-body-medium flex items-center justify-center transition-all" role="tab">
+        All
+      </button>
+<button aria-selected="false" class="h-10 rounded-lg text-on-surface-variant hover:text-on-surface font-body-medium text-body-medium flex items-center justify-center transition-all" role="tab">
+        Lighting
+      </button>
+<button aria-selected="false" class="h-10 rounded-lg text-on-surface-variant hover:text-on-surface font-body-medium text-body-medium flex items-center justify-center transition-all" role="tab">
+        Climate
+      </button>
+<button aria-selected="false" class="h-10 rounded-lg text-on-surface-variant hover:text-on-surface font-body-medium text-body-medium flex items-center justify-center transition-all" role="tab">
+        Security
+      </button>
+</div>
+</div>
+<!-- Room Horizontal Filter Chips -->
+<div class="flex items-center gap-space-xs overflow-x-auto px-margin py-space-sm no-scrollbar">
+<button class="px-4 py-2 h-10 rounded-xl bg-primary text-on-primary font-body-medium text-body-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">weekend</span>
+<span>Living Room</span>
+<span class="ml-1 px-1.5 py-0.2 rounded-full bg-surface text-primary font-label-micro text-label-micro">3</span>
+</button>
+<button class="px-4 py-2 h-10 rounded-xl bg-surface-container text-on-surface-variant font-body-medium text-body-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">bed</span>
+<span>Bedroom</span>
+<span class="ml-1 px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface-variant font-label-micro text-label-micro">2</span>
+</button>
+<button class="px-4 py-2 h-10 rounded-xl bg-surface-container text-on-surface-variant font-body-medium text-body-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">countertops</span>
+<span>Kitchen</span>
+<span class="ml-1 px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface-variant font-label-micro text-label-micro">1</span>
+</button>
+<button class="px-4 py-2 h-10 rounded-xl bg-surface-container text-on-surface-variant font-body-medium text-body-medium whitespace-nowrap flex items-center gap-1.5 shrink-0 hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">door_front</span>
+<span>Hallway</span>
+<span class="ml-1 px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface-variant font-label-micro text-label-micro">2</span>
+</button>
+</div>
+<!-- Main Device List Cards Container -->
+<div class="px-margin flex flex-col gap-space-lg mt-space-xs">
+<!-- SECTION 1: Living Room -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Living Room</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-micro text-label-micro text-on-surface-variant">3 Active</span>
+</div>
+<button class="text-primary font-label-caption text-label-caption flex items-center gap-0.5">
+<span>All Off</span>
+<span class="material-symbols-outlined text-[16px]">power_settings_new</span>
+</button>
+</div>
+<!-- Device 1: Ceiling Light (Active Card) -->
+<div class="w-full rounded-xl bg-surface-container p-space-md flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[24px]">lightbulb</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card text-on-surface font-medium truncate max-w-[170px]">Ceiling Luminaire</span>
+<span class="w-2 h-2 rounded-full bg-primary-container inline-block"></span>
+</div>
+<span class="font-label-caption text-label-caption text-on-surface-variant">Living Zone • 18W</span>
+</div>
+</div>
+<!-- 48x28 Pill Toggle Switch (Active) -->
+<button aria-label="Toggle ceiling light" class="w-12 h-7 rounded-full bg-primary-container p-0.5 flex items-center justify-end transition-colors cursor-pointer" onclick="this.classList.toggle('bg-primary-container'); this.classList.toggle('bg-surface-container-high'); this.classList.toggle('justify-end'); this.classList.toggle('justify-start');">
+<span class="w-6 h-6 rounded-full bg-surface shadow-sm inline-block"></span>
+</button>
+</div>
+<!-- Brightness Slider Control -->
+<div class="flex flex-col gap-1.5 pt-1">
+<div class="flex justify-between items-center text-label-caption font-label-caption">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">brightness_medium</span>
+              Level
+            </span>
+<span class="text-primary font-semibold tabular-nums" id="bright-val-1">70%</span>
+</div>
+<div class="relative w-full h-8 flex items-center">
+<input class="w-full h-2 rounded-full bg-surface-container-highest appearance-none cursor-pointer accent-primary" max="100" min="0" oninput="document.getElementById('bright-val-1').innerText = this.value + '%'" type="range" value="70"/>
+</div>
+</div>
+</div>
+<!-- Device 2: Desk Lamp -->
+<div class="w-full rounded-xl bg-surface-container p-space-md flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined text-[24px]">deskphone</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card text-on-surface font-medium truncate max-w-[170px]">Nordic Desk Lamp</span>
+<span class="w-2 h-2 rounded-full bg-primary-container inline-block"></span>
+</div>
+<span class="font-label-caption text-label-caption text-on-surface-variant">Reading Corner • 8W</span>
+</div>
+</div>
+<!-- 48x28 Pill Toggle Switch (Active) -->
+<button aria-label="Toggle desk lamp" class="w-12 h-7 rounded-full bg-primary-container p-0.5 flex items-center justify-end transition-colors cursor-pointer" onclick="this.classList.toggle('bg-primary-container'); this.classList.toggle('bg-surface-container-high'); this.classList.toggle('justify-end'); this.classList.toggle('justify-start');">
+<span class="w-6 h-6 rounded-full bg-surface shadow-sm inline-block"></span>
+</button>
+</div>
+<!-- Brightness Slider Control -->
+<div class="flex flex-col gap-1.5 pt-1">
+<div class="flex justify-between items-center text-label-caption font-label-caption">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">brightness_medium</span>
+              Warmth &amp; Output
+            </span>
+<span class="text-primary font-semibold tabular-nums" id="bright-val-2">40%</span>
+</div>
+<div class="relative w-full h-8 flex items-center">
+<input class="w-full h-2 rounded-full bg-surface-container-highest appearance-none cursor-pointer accent-primary" max="100" min="0" oninput="document.getElementById('bright-val-2').innerText = this.value + '%'" type="range" value="40"/>
+</div>
+</div>
+</div>
+<!-- Device 3: Smart AC Thermostat Module -->
+<div class="w-full rounded-xl bg-surface-container p-space-md flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-tertiary-container/20 flex items-center justify-center text-tertiary shrink-0">
+<span class="material-symbols-outlined text-[24px]">thermostat</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card text-on-surface font-medium">Smart Inverter AC</span>
+<span class="w-2 h-2 rounded-full bg-primary-container inline-block"></span>
+</div>
+<span class="font-label-caption text-label-caption text-on-surface-variant flex items-center gap-1.5">
+<span>Living Climate</span>
+<span>•</span>
+<span class="text-tertiary font-semibold tabular-nums">Current 25.1°C</span>
+</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high font-label-caption text-label-caption text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-secondary">water_drop</span>
+<span class="tabular-nums">54%</span>
+</span>
+</div>
+<!-- Target Temperature Controller Dial / Stepper Strip -->
+<div class="flex items-center justify-between bg-surface-container-low p-space-sm rounded-xl">
+<button aria-label="Decrease temperature" class="w-12 h-12 rounded-lg bg-surface-container-high text-on-surface active:bg-surface-variant flex items-center justify-center text-xl font-bold transition-all" onclick="adjustTemp(-0.5)">
+            −
+          </button>
+<div class="flex flex-col items-center">
+<div class="flex items-baseline">
+<span class="font-display-metric text-display-metric text-tertiary font-semibold tabular-nums tracking-tight" id="target-temp">24.0</span>
+<span class="text-headline-sm font-headline-sm text-tertiary ml-0.5">°C</span>
+</div>
+<span class="font-label-micro text-label-micro text-on-surface-variant uppercase tracking-wider">Target Room Temp</span>
+</div>
+<button aria-label="Increase temperature" class="w-12 h-12 rounded-lg bg-surface-container-high text-on-surface active:bg-surface-variant flex items-center justify-center text-xl font-bold transition-all" onclick="adjustTemp(0.5)">
+            +
+          </button>
+</div>
+<!-- AC Mode Pills -->
+<div class="grid grid-cols-4 gap-1.5 pt-0.5">
+<button class="h-10 rounded-lg bg-tertiary-container text-on-tertiary-container font-label-caption text-label-caption font-semibold flex items-center justify-center gap-1 transition-all">
+<span class="material-symbols-outlined text-[16px]">ac_unit</span>
+            Cool
+          </button>
+<button class="h-10 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-caption text-label-caption flex items-center justify-center gap-1 transition-all">
+<span class="material-symbols-outlined text-[16px]">wb_sunny</span>
+            Heat
+          </button>
+<button class="h-10 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-caption text-label-caption flex items-center justify-center gap-1 transition-all">
+<span class="material-symbols-outlined text-[16px]">air</span>
+            Fan
+          </button>
+<button class="h-10 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-caption text-label-caption flex items-center justify-center gap-1 transition-all">
+<span class="material-symbols-outlined text-[16px]">hdr_auto</span>
+            Auto
+          </button>
+</div>
+</div>
+</div>
+<!-- SECTION 2: Bedroom -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Bedroom</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-micro text-label-micro text-on-surface-variant">2 Sensors Active</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Sensor 1: Door Sensor -->
+<div class="rounded-xl bg-surface-container p-space-md flex flex-col justify-between h-36">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">sensor_door</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-card text-title-card text-on-surface font-medium truncate">Door Sensor</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-caption text-label-caption text-primary font-medium">Closed</span>
+</div>
+</div>
+</div>
+<!-- Sensor 2: Motion Sensor -->
+<div class="rounded-xl bg-surface-container p-space-md flex flex-col justify-between h-36">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">sensors</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-card text-title-card text-on-surface font-medium truncate">Radar Motion</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+<span class="font-label-caption text-label-caption text-on-surface-variant font-medium">Clear</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 3: Hallway & Offline Alert Zone -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Hallway &amp; Entry</span>
+</div>
+<!-- Device: Hall Smart Lock -->
+<div class="w-full rounded-xl bg-surface-container p-space-md flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[24px]">lock</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card text-on-surface font-medium">Hallway Smart Lock</span>
+</div>
+<span class="font-label-caption text-label-caption text-primary font-medium flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+              Secured • Battery 92%
+            </span>
+</div>
+</div>
+<button aria-label="Toggle lock state" class="h-10 px-3.5 rounded-lg bg-surface-container-high text-on-surface font-body-medium text-body-medium flex items-center gap-1.5 active:bg-surface-variant" onclick="toggleLock(this)">
+<span class="material-symbols-outlined text-[18px] text-primary">lock_open</span>
+<span>Unlock</span>
+</button>
+</div>
+<!-- Offline Device: Kitchen Smart Plug -->
+<div class="w-full rounded-xl bg-surface-container-low p-space-md flex items-center justify-between opacity-80 mt-1">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-outline-variant shrink-0">
+<span class="material-symbols-outlined text-[24px]">power</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card text-on-surface-variant font-medium">Kitchen Smart Plug</span>
+<span class="w-2 h-2 rounded-full bg-error inline-block"></span>
+</div>
+<span class="font-label-caption text-label-caption text-error">Offline for 2h • Ping timed out</span>
+</div>
+</div>
+<button class="h-10 px-3 rounded-lg bg-surface-container-high text-on-surface font-label-caption text-label-caption font-semibold flex items-center gap-1 hover:bg-surface-variant active:scale-95 transition-all" onclick="attemptReconnect(this)">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span>Reconnect</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Floating Action Button (FAB) anchored within bounds -->
+<div class="fixed bottom-20 right-4 z-40">
+<button class="h-12 px-5 rounded-full bg-primary-container text-on-primary-container font-body-medium text-body-medium font-semibold flex items-center gap-2 shadow-lg active:scale-95 transition-transform" onclick="triggerDeviceAddModal()">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Add Device</span>
+</button>
+</div>
+<!-- Microinteraction Helper Scripts -->
+<script>
+    function adjustTemp(delta) {
+      const el = document.getElementById('target-temp');
+      if (!el) return;
+      let curr = parseFloat(el.innerText);
+      curr = Math.max(16.0, Math.min(30.0, curr + delta));
+      el.innerText = curr.toFixed(1);
+    }
+
+    function toggleLock(btn) {
+      const isLocked = btn.innerText.includes('Unlock');
+      if (isLocked) {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px] text-error">lock</span><span>Lock</span>';
+      } else {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px] text-primary">lock_open</span><span>Unlock</span>';
+      }
+    }
+
+    function attemptReconnect(btn) {
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span><span>Connecting</span>';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-primary">check</span><span>Done</span>';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 1500);
+      }, 1200);
+    }
+
+    function triggerDeviceAddModal() {
+      // Visual feedback ripple for demonstration
+      const fab = document.querySelector('button[aria-label="Add device quick trigger"]');
+      if (fab) {
+        fab.classList.add('bg-primary', 'text-on-primary');
+        setTimeout(() => fab.classList.remove('bg-primary', 'text-on-primary'), 300);
+      }
+    }
+  </script>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.5)]" data-active-classes="text-primary-container font-medium"><div class="flex items-center justify-around h-16 px-space-xs"><a class="flex flex-col items-center justify-center w-16 h-12 gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="home" href="#"><span class="material-symbols-outlined text-[22px]">home</span><span class="font-label-micro text-label-micro">Home</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="devices" href="#"><span class="material-symbols-outlined text-[22px]">devices</span><span class="font-label-micro text-label-micro">Devices</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="automation" href="#"><span class="material-symbols-outlined text-[22px]">hdr_auto</span><span class="font-label-micro text-label-micro">Automation</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="energy" href="#"><span class="material-symbols-outlined text-[22px]">bolt</span><span class="font-label-micro text-label-micro">Energy</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="security" href="#"><span class="material-symbols-outlined text-[22px]">shield</span><span class="font-label-micro text-label-micro">Security</span></a></div></nav></body></html>
