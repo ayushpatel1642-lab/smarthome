@@ -17,10 +17,20 @@ export const EnergyPage: React.FC = () => {
   const [selectedBarIdx, setSelectedBarIdx] = useState<number | null>(null);
 
   const periodPoints = useMemo(() => {
-    return state.energyLogs
+    const basePoints = state.energyLogs
       .filter((e) => e.period === period)
       .sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [state.energyLogs, period]);
+    if (basePoints.length === 0) return basePoints;
+    const liveDeltaKwh = ((totalInstantWatts - 1018) / 1000) * (period === 'day' ? 1.5 : 2.5);
+    return basePoints.map((pt, idx) =>
+      idx === basePoints.length - 1
+        ? {
+            ...pt,
+            actualKwh: Math.max(0.2, Math.round((pt.actualKwh + liveDeltaKwh) * 10) / 10),
+          }
+        : pt
+    );
+  }, [state.energyLogs, period, totalInstantWatts]);
 
   const metrics = useMemo(() => {
     const totalActual = periodPoints.reduce((s, p) => s + p.actualKwh, 0);
@@ -142,9 +152,13 @@ export const EnergyPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-outline flex items-center justify-between text-text-xs">
-            <span className="text-on-surface-variant">
-              Off-peak share at <strong className="text-on-surface font-semibold">68%</strong>
+          <div className="pt-3 border-t border-outline flex flex-wrap items-center justify-between gap-2 text-text-xs">
+            <span className="text-on-surface-variant tabular-nums">
+              Live draw{' '}
+              <strong className="text-on-surface font-semibold">
+                {(totalInstantWatts / 1000).toFixed(2)} kW
+              </strong>{' '}
+              · Off-peak share <strong className="text-on-surface font-semibold">68%</strong>
             </span>
             <span className="text-accent-text font-semibold tabular-nums">
               ₹{state.profile.tariffBase.toFixed(1)} base rate

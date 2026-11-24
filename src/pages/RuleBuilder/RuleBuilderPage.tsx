@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/common/Button';
 import { AppShell } from '../../components/navigation/AppShell';
 import { useHome } from '../../context/HomeContext';
-import type { RuleAction, RuleCondition, RulePriority } from '../../types/home';
+import type { AiRecommendation, RuleAction, RuleCondition, RulePriority } from '../../types/home';
 
 const TRIGGERS = [
   { type: 'presence', label: 'Presence — Everyone Leaves', icon: 'directions_walk', zone: 'Whole Residence Geofence' },
@@ -88,29 +88,78 @@ const DAYS = [
 export const RuleBuilderPage: React.FC = () => {
   const { ruleId } = useParams<{ ruleId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { state, saveAutomation, testAutomationRule, showToast } = useHome();
 
   const existing = ruleId ? state.automations.find((a) => String(a.id) === ruleId) : undefined;
+  const draft = !existing
+    ? ((location.state as { draftFromRecommendation?: AiRecommendation } | null)
+        ?.draftFromRecommendation ?? undefined)
+    : undefined;
 
-  const [name, setName] = useState(existing?.name || 'Away Eco & Perimeter Lock');
-  const [triggerType, setTriggerType] = useState(existing?.triggerType || 'presence');
+  const initialTriggerFromDraft = (() => {
+    if (!draft) return 'presence';
+    if (draft.category === 'energy') return 'tariff';
+    if (draft.category === 'climate') return 'temperature';
+    return 'schedule';
+  })();
+
+  const initialActionsFromDraft = (): RuleAction[] => {
+    if (!draft) {
+      return [
+        { id: 'a-1', ...ACTION_PRESETS[0] },
+        { id: 'a-2', ...ACTION_PRESETS[1] },
+      ];
+    }
+    const payloadType = String(draft.actionPayload?.type ?? '');
+    if (
+      draft.category === 'climate' ||
+      draft.category === 'energy' ||
+      payloadType.includes('ac') ||
+      payloadType.includes('temp') ||
+      draft.actionPayload?.targetTemp !== undefined
+    ) {
+      const targetTemp = Number(draft.actionPayload?.targetTemp ?? draft.actionPayload?.temp ?? 25);
+      return [
+        {
+          id: 'a-draft-1',
+          label: `Set Smart AC to ${targetTemp}°C Eco`,
+          detail: draft.description,
+          icon: 'ac_unit',
+          endIcon: 'eco',
+          actionType: 'set_temp',
+          payload: { temp: targetTemp },
+        },
+      ];
+    }
+    if (payloadType.includes('night') || payloadType.includes('security')) {
+      return [
+        { id: 'a-draft-1', ...ACTION_PRESETS[0] },
+        { id: 'a-draft-2', ...ACTION_PRESETS[2] },
+      ];
+    }
+    return [
+      { id: 'a-draft-1', ...ACTION_PRESETS[1] },
+      { id: 'a-draft-2', ...ACTION_PRESETS[2] },
+    ];
+  };
+
+  const [name, setName] = useState(existing?.name || draft?.title || 'Away Eco & Perimeter Lock');
+  const [triggerType, setTriggerType] = useState(existing?.triggerType || initialTriggerFromDraft);
   const [conditions, setConditions] = useState<RuleCondition[]>(
     existing?.conditions?.length
       ? existing.conditions
       : [{ id: 'c-1', ...CONDITION_PRESETS[0] }]
   );
   const [actions, setActions] = useState<RuleAction[]>(
-    existing?.actions?.length
-      ? existing.actions
-      : [
-          { id: 'a-1', ...ACTION_PRESETS[0] },
-          { id: 'a-2', ...ACTION_PRESETS[1] },
-        ]
+    existing?.actions?.length ? existing.actions : initialActionsFromDraft()
   );
   const [days, setDays] = useState<string[]>(
     existing?.days?.length ? existing.days : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
   );
-  const [startTime, setStartTime] = useState(existing?.startTime || '08:00');
+  const [startTime, setStartTime] = useState(
+    existing?.startTime || (draft?.category === 'energy' ? '18:00' : '08:00')
+  );
   const [endTime, setEndTime] = useState(existing?.endTime || '22:00');
   const [priority, setPriority] = useState<RulePriority>(existing?.priority || 'Normal');
   const [showCondPicker, setShowCondPicker] = useState(false);
@@ -147,7 +196,7 @@ export const RuleBuilderPage: React.FC = () => {
       {
         name: name.trim(),
         description: `${selectedTrigger.label} → ${actions.map((a) => a.label).join(', ')}`,
-        source: existing?.source || 'manual',
+        source: existing?.source || (draft ? 'ai' : 'manual'),
         enabled: existing?.enabled ?? true,
         triggerType: selectedTrigger.type,
         triggerLabel: selectedTrigger.label,
@@ -473,7 +522,9 @@ export const RuleBuilderPage: React.FC = () => {
               variant="secondary"
               fullWidth
               className="h-10"
-              onClick={() => testAutomationRule({ name: name || 'Untitled Rule', actions })}
+              onClick={() =>
+                testAutomationRule({ id: existing?.id, name: name || 'Untitled Rule', actions })
+              }
             >
               <span className="material-symbols-outlined text-[18px] text-accent-text">
                 play_arrow

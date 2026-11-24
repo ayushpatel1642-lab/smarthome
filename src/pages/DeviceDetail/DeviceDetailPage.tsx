@@ -29,9 +29,13 @@ export const DeviceDetailPage: React.FC = () => {
     state,
     primaryAc,
     toggleDevicePower,
+    setDeviceBrightness,
     setAcTemperature,
     setAcMode,
     setAcFanSpeed,
+    toggleLock,
+    toggleSensorState,
+    reconnectDevice,
     renameDevice,
     removeDevice,
   } = useHome();
@@ -42,6 +46,7 @@ export const DeviceDetailPage: React.FC = () => {
   const [renameOpen, setRenameOpen] = useState(false);
   const [nameDraft, setNameDraft] = useState(device?.name || '');
   const [removeConfirmOpen, setRemoveConfirmOpen] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
 
   if (!device) {
     return (
@@ -57,20 +62,28 @@ export const DeviceDetailPage: React.FC = () => {
   }
 
   const unit = state.profile.tempUnit;
+  const isAc = device.deviceType === 'ac';
+  const isLight = device.deviceType === 'light';
+  const isLock = device.deviceType === 'lock';
+  const isSensor =
+    device.deviceType === 'door_sensor' ||
+    device.deviceType === 'window_sensor' ||
+    device.deviceType === 'motion_sensor';
+
   const targetTemp = device.targetTemp ?? 24.0;
   const currentTemp = device.currentTemp ?? 24.5;
   const humidity = device.humidity ?? 58;
+  const brightness = device.isOn ? (device.brightness ?? 75) : 0;
 
-  const minTemp = 16;
-  const maxTemp = 30;
-  const ratio = Math.max(0, Math.min(1, (targetTemp - minTemp) / (maxTemp - minTemp)));
+  // Dial math shared between AC (16-30°C) and Light (0-100%)
+  const ratio = isAc
+    ? Math.max(0, Math.min(1, (targetTemp - 16) / (30 - 16)))
+    : Math.max(0, Math.min(1, brightness / 100));
   const radius = 88;
   const circumference = 2 * Math.PI * radius;
-  const arcFraction = 0.75;
-  const totalArcLen = circumference * arcFraction;
+  const totalArcLen = circumference * 0.75;
   const activeArcLen = totalArcLen * ratio;
-  const notchAngleDeg = 135 + ratio * 270;
-  const notchRad = (notchAngleDeg * Math.PI) / 180;
+  const notchRad = ((135 + ratio * 270) * Math.PI) / 180;
   const notchX = 110 + radius * Math.cos(notchRad);
   const notchY = 110 + radius * Math.sin(notchRad);
 
@@ -87,6 +100,12 @@ export const DeviceDetailPage: React.FC = () => {
     navigate('/devices');
   };
 
+  const handleReconnect = async () => {
+    setReconnecting(true);
+    await reconnectDevice(device.id);
+    setReconnecting(false);
+  };
+
   return (
     <AppShell
       headerMode="stack"
@@ -99,11 +118,21 @@ export const DeviceDetailPage: React.FC = () => {
         {/* Top Hero Info Card */}
         <section className="rounded-xl bg-surface-container border border-outline p-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-11 h-11 rounded-lg bg-accent/10 border border-outline text-accent-text flex items-center justify-center shrink-0">
+            <div
+              className={`w-11 h-11 rounded-lg border flex items-center justify-center shrink-0 ${
+                device.online
+                  ? 'bg-accent/10 border-outline text-accent-text'
+                  : 'bg-error/10 border-error/40 text-error'
+              }`}
+            >
               <span className="material-symbols-outlined text-[24px]">{device.icon}</span>
             </div>
             <div className="min-w-0">
-              <div className="text-eyebrow-s text-accent-text">
+              <div
+                className={`text-eyebrow-s ${
+                  device.online ? 'text-accent-text' : 'text-error'
+                }`}
+              >
                 {device.roomName} · {device.online ? 'Online' : 'Offline'}
               </div>
               <h2 className="text-text-m font-semibold text-on-surface truncate">{device.name}</h2>
@@ -111,173 +140,322 @@ export const DeviceDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            role="switch"
-            aria-checked={device.isOn}
-            aria-label="Toggle AC power"
-            onClick={() => toggleDevicePower(device.id)}
-            className={`w-13 h-7 rounded-full p-1 transition-colors shrink-0 ${
-              device.isOn ? 'bg-amplitude-blue' : 'bg-surface-container-highest'
-            }`}
-          >
-            <span
-              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                device.isOn ? 'translate-x-6' : 'translate-x-0'
+          {!device.online ? (
+            <Button variant="primary" size="small" isLoading={reconnecting} onClick={handleReconnect}>
+              Reconnect
+            </Button>
+          ) : isLock ? (
+            <Button
+              variant={device.isLocked ? 'secondary' : 'primary'}
+              size="small"
+              onClick={() => toggleLock(device.id)}
+            >
+              {device.isLocked ? 'Unlock' : 'Lock'}
+            </Button>
+          ) : isSensor ? (
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={() => toggleSensorState(device.id)}
+            >
+              Simulate trigger
+            </Button>
+          ) : (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={device.isOn}
+              aria-label={`Toggle ${device.name} power`}
+              onClick={() => toggleDevicePower(device.id)}
+              className={`w-13 h-7 rounded-full p-1 transition-colors shrink-0 ${
+                device.isOn ? 'bg-amplitude-blue' : 'bg-surface-container-highest'
               }`}
-            />
-          </button>
-        </section>
-
-        {/* Circular SVG Thermostat Dial Card */}
-        <section className="rounded-xl bg-surface-container border border-outline p-5 flex flex-col items-center">
-          <div className="relative w-[220px] h-[220px] flex items-center justify-center">
-            <svg viewBox="0 0 220 220" className="w-full h-full">
-              <circle
-                cx="110"
-                cy="110"
-                r={radius}
-                fill="none"
-                stroke="var(--color-chart-baseline)"
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeDasharray={`${totalArcLen} ${circumference}`}
-                transform="rotate(135 110 110)"
-              />
-              {device.isOn && (
-                <circle
-                  cx="110"
-                  cy="110"
-                  r={radius}
-                  fill="none"
-                  stroke="var(--color-chart-primary)"
-                  strokeWidth="12"
-                  strokeLinecap="round"
-                  strokeDasharray={`${activeArcLen} ${circumference}`}
-                  transform="rotate(135 110 110)"
-                  style={{ transition: 'stroke-dasharray 220ms ease' }}
-                />
-              )}
-              {device.isOn && (
-                <circle
-                  cx={notchX}
-                  cy={notchY}
-                  r="7"
-                  fill="var(--color-chart-notch)"
-                  stroke="var(--color-surface)"
-                  strokeWidth="2.5"
-                />
-              )}
-            </svg>
-
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-eyebrow-s text-on-surface-variant">Target</span>
-              <span className="text-display-metric text-on-surface tabular-nums mt-0.5">
-                {formatTempValue(targetTemp, unit, 1)}°
-              </span>
+            >
               <span
-                className={`mt-1 text-text-xs font-semibold ${
-                  device.isOn ? 'text-accent-text' : 'text-on-surface-variant'
+                className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  device.isOn ? 'translate-x-6' : 'translate-x-0'
                 }`}
-              >
-                {device.isOn ? 'Maintaining' : 'Standby'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 mt-2">
-            <Button
-              variant="secondary"
-              iconOnly
-              onClick={() => setAcTemperature(device.id, targetTemp - 0.5)}
-              aria-label="Decrease target temperature by 0.5 degrees"
-              className="w-11 h-11"
-            >
-              <span className="material-symbols-outlined text-[20px]">remove</span>
-            </Button>
-            <div className="text-center min-w-[76px]">
-              <div className="text-text-xs font-semibold text-on-surface">0.5° Step</div>
-              <div className="text-text-xs text-on-surface-variant tabular-nums">
-                {device.powerWatts}W draw
-              </div>
-            </div>
-            <Button
-              variant="secondary"
-              iconOnly
-              onClick={() => setAcTemperature(device.id, targetTemp + 0.5)}
-              aria-label="Increase target temperature by 0.5 degrees"
-              className="w-11 h-11"
-            >
-              <span className="material-symbols-outlined text-[20px]">add</span>
-            </Button>
-          </div>
-
-          <div className="w-full mt-5 pt-4 border-t border-outline grid grid-cols-3 gap-2 text-center">
-            <div className="p-2">
-              <div className="text-text-xs text-on-surface-variant">Current room</div>
-              <div className="text-text-s font-semibold text-on-surface mt-0.5 tabular-nums">
-                {formatTemp(currentTemp, unit, 1)}
-              </div>
-            </div>
-            <div className="p-2 border-x border-outline">
-              <div className="text-text-xs text-on-surface-variant">Humidity</div>
-              <div className="text-text-s font-semibold text-on-surface mt-0.5 tabular-nums">
-                {humidity}%
-              </div>
-            </div>
-            <div className="p-2">
-              <div className="text-text-xs text-on-surface-variant">Outdoor</div>
-              <div className="text-text-s font-semibold text-on-surface mt-0.5 tabular-nums">
-                {formatTemp(31, unit, 0)}
-              </div>
-            </div>
-          </div>
+              />
+            </button>
+          )}
         </section>
 
-        {/* Operational Mode 5-Col Grid */}
-        <section className="rounded-xl bg-surface-container border border-outline p-4 space-y-4">
-          <div>
-            <h3 className="text-eyebrow-s text-on-surface-variant mb-2.5">Operational mode</h3>
-            <div className="grid grid-cols-5 gap-2">
-              {AC_MODES.map((m) => {
-                const selected = device.acMode === m.id && device.isOn;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => setAcMode(device.id, m.id)}
-                    className={`flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg border text-text-xs font-semibold transition-colors ${
-                      selected
-                        ? 'bg-amplitude-blue border-amplitude-blue text-white'
-                        : 'bg-surface border-outline text-on-surface-variant hover:text-on-surface'
+        {/* AC Controls: Thermostat Dial + Modes + Fan */}
+        {isAc && (
+          <>
+            <section className="rounded-xl bg-surface-container border border-outline p-5 flex flex-col items-center">
+              <div className="relative w-[220px] h-[220px] flex items-center justify-center">
+                <svg viewBox="0 0 220 220" className="w-full h-full">
+                  <circle
+                    cx="110"
+                    cy="110"
+                    r={radius}
+                    fill="none"
+                    stroke="var(--color-chart-baseline)"
+                    strokeWidth="12"
+                    strokeLinecap="round"
+                    strokeDasharray={`${totalArcLen} ${circumference}`}
+                    transform="rotate(135 110 110)"
+                  />
+                  {device.isOn && (
+                    <circle
+                      cx="110"
+                      cy="110"
+                      r={radius}
+                      fill="none"
+                      stroke="var(--color-chart-primary)"
+                      strokeWidth="12"
+                      strokeLinecap="round"
+                      strokeDasharray={`${activeArcLen} ${circumference}`}
+                      transform="rotate(135 110 110)"
+                      style={{ transition: 'stroke-dasharray 220ms ease' }}
+                    />
+                  )}
+                  {device.isOn && (
+                    <circle
+                      cx={notchX}
+                      cy={notchY}
+                      r="7"
+                      fill="var(--color-chart-notch)"
+                      stroke="var(--color-surface)"
+                      strokeWidth="2.5"
+                    />
+                  )}
+                </svg>
+
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span className="text-eyebrow-s text-on-surface-variant">Target</span>
+                  <span className="text-display-metric text-on-surface tabular-nums mt-0.5">
+                    {formatTempValue(targetTemp, unit, 1)}°
+                  </span>
+                  <span
+                    className={`mt-1 text-text-xs font-semibold ${
+                      device.isOn ? 'text-accent-text' : 'text-on-surface-variant'
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[18px]">{m.icon}</span>
-                    <span>{m.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                    {device.isOn
+                      ? Math.abs(currentTemp - targetTemp) < 0.2
+                        ? 'Maintaining'
+                        : currentTemp > targetTemp
+                          ? 'Cooling'
+                          : 'Warming'
+                      : 'Standby'}
+                  </span>
+                </div>
+              </div>
 
-          <div>
-            <h3 className="text-eyebrow-s text-on-surface-variant mb-2.5">Fan speed</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {FAN_SPEEDS.map((f) => {
-                const selected = (device.fanSpeed || 'auto') === f.id;
-                return (
-                  <Button
-                    key={f.id}
-                    variant={selected ? 'primary' : 'secondary'}
-                    onClick={() => setAcFanSpeed(device.id, f.id)}
-                  >
-                    {f.label}
-                  </Button>
-                );
-              })}
+              <div className="flex items-center gap-6 mt-2">
+                <Button
+                  variant="secondary"
+                  iconOnly
+                  onClick={() => setAcTemperature(device.id, targetTemp - 0.5)}
+                  aria-label="Decrease target temperature by 0.5 degrees"
+                  className="w-11 h-11"
+                >
+                  <span className="material-symbols-outlined text-[20px]">remove</span>
+                </Button>
+                <div className="text-center min-w-[76px]">
+                  <div className="text-text-xs font-semibold text-on-surface">0.5° Step</div>
+                  <div className="text-text-xs text-on-surface-variant tabular-nums">
+                    {device.powerWatts}W draw
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  iconOnly
+                  onClick={() => setAcTemperature(device.id, targetTemp + 0.5)}
+                  aria-label="Increase target temperature by 0.5 degrees"
+                  className="w-11 h-11"
+                >
+                  <span className="material-symbols-outlined text-[20px]">add</span>
+                </Button>
+              </div>
+
+              <div className="w-full mt-5 pt-4 border-t border-outline grid grid-cols-3 gap-2 text-center">
+                <div className="p-2">
+                  <div className="text-text-xs text-on-surface-variant">Current room</div>
+                  <div className="text-text-s font-semibold text-on-surface mt-0.5 tabular-nums">
+                    {formatTemp(currentTemp, unit, 1)}
+                  </div>
+                </div>
+                <div className="p-2 border-x border-outline">
+                  <div className="text-text-xs text-on-surface-variant">Humidity</div>
+                  <div className="text-text-s font-semibold text-on-surface mt-0.5 tabular-nums">
+                    {humidity}%
+                  </div>
+                </div>
+                <div className="p-2">
+                  <div className="text-text-xs text-on-surface-variant">Outdoor</div>
+                  <div className="text-text-s font-semibold text-on-surface mt-0.5 tabular-nums">
+                    {formatTemp(31, unit, 0)}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-xl bg-surface-container border border-outline p-4 space-y-4">
+              <div>
+                <h3 className="text-eyebrow-s text-on-surface-variant mb-2.5">Operational mode</h3>
+                <div className="grid grid-cols-5 gap-2">
+                  {AC_MODES.map((m) => {
+                    const selected = device.acMode === m.id && device.isOn;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setAcMode(device.id, m.id)}
+                        className={`flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg border text-text-xs font-semibold transition-colors ${
+                          selected
+                            ? 'bg-amplitude-blue border-amplitude-blue text-white'
+                            : 'bg-surface border-outline text-on-surface-variant hover:text-on-surface'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">{m.icon}</span>
+                        <span>{m.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-eyebrow-s text-on-surface-variant mb-2.5">Fan speed</h3>
+                <div className="grid grid-cols-4 gap-2">
+                  {FAN_SPEEDS.map((f) => {
+                    const selected = (device.fanSpeed || 'auto') === f.id;
+                    return (
+                      <Button
+                        key={f.id}
+                        variant={selected ? 'primary' : 'secondary'}
+                        onClick={() => setAcFanSpeed(device.id, f.id)}
+                      >
+                        {f.label}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* Light Controls: Brightness Dial + Presets */}
+        {isLight && (
+          <section className="rounded-xl bg-surface-container border border-outline p-5 space-y-5">
+            <div className="flex flex-col items-center">
+              <div className="relative w-[200px] h-[200px] flex items-center justify-center">
+                <svg viewBox="0 0 220 220" className="w-full h-full">
+                  <circle
+                    cx="110"
+                    cy="110"
+                    r={radius}
+                    fill="none"
+                    stroke="var(--color-chart-baseline)"
+                    strokeWidth="12"
+                    strokeLinecap="round"
+                    strokeDasharray={`${totalArcLen} ${circumference}`}
+                    transform="rotate(135 110 110)"
+                  />
+                  {brightness > 0 && (
+                    <circle
+                      cx="110"
+                      cy="110"
+                      r={radius}
+                      fill="none"
+                      stroke="var(--color-chart-primary)"
+                      strokeWidth="12"
+                      strokeLinecap="round"
+                      strokeDasharray={`${activeArcLen} ${circumference}`}
+                      transform="rotate(135 110 110)"
+                      style={{ transition: 'stroke-dasharray 200ms ease' }}
+                    />
+                  )}
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-eyebrow-s text-on-surface-variant">Brightness</span>
+                  <span className="text-display-metric text-on-surface tabular-nums">
+                    {brightness}%
+                  </span>
+                  <span className="text-text-xs text-accent-text font-semibold tabular-nums">
+                    {device.powerWatts}W draw
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+
+            <div className="space-y-3">
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={brightness}
+                onChange={(e) => setDeviceBrightness(device.id, Number(e.target.value))}
+                aria-label="Adjust light brightness"
+                className="w-full h-2 rounded-full accent-amplitude-blue cursor-pointer bg-surface-container-highest"
+              />
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { label: 'Off', val: 0 },
+                  { label: 'Ambient 30%', val: 30 },
+                  { label: 'Focus 75%', val: 75 },
+                  { label: 'Full 100%', val: 100 },
+                ].map((preset) => (
+                  <Button
+                    key={preset.label}
+                    variant={brightness === preset.val ? 'primary' : 'secondary'}
+                    size="small"
+                    onClick={() => setDeviceBrightness(device.id, preset.val)}
+                  >
+                    {preset.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Lock or Sensor Interactive Panel */}
+        {(isLock || isSensor) && (
+          <section className="rounded-xl bg-surface-container border border-outline p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-eyebrow-s text-accent-text">
+                  {isLock ? 'Deadbolt state' : 'Live sensor telemetry'}
+                </div>
+                <div className="text-title-s font-semibold text-on-surface mt-1">
+                  {isLock
+                    ? device.isLocked
+                      ? 'Locked & secured'
+                      : 'Unlocked'
+                    : device.sensorStatus || 'Clear'}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-text-xs text-on-surface-variant">Battery</div>
+                <div className="text-text-m font-semibold text-on-surface tabular-nums">
+                  {device.battery ?? 94}%
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-outline flex items-center justify-between gap-3">
+              <span className="text-text-xs text-on-surface-variant">
+                {isLock
+                  ? 'Changes are logged immediately to the security timeline.'
+                  : 'Test how armed perimeter monitoring responds to this zone.'}
+              </span>
+              {isLock ? (
+                <Button variant="primary" onClick={() => toggleLock(device.id)}>
+                  {device.isLocked ? 'Unlock door' : 'Lock door'}
+                </Button>
+              ) : (
+                <Button variant="primary" onClick={() => toggleSensorState(device.id)}>
+                  Toggle sensor state
+                </Button>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* 24-Hour Usage SVG Chart */}
         <section className="rounded-xl bg-surface-container border border-outline p-4">
@@ -285,11 +463,11 @@ export const DeviceDetailPage: React.FC = () => {
             <div>
               <h3 className="text-text-s font-semibold text-on-surface">24-hour power usage</h3>
               <p className="text-text-xs text-on-surface-variant tabular-nums">
-                Compressor duty cycle · {device.weeklyKwh} kWh this week
+                {device.weeklyKwh} kWh this week
               </p>
             </div>
             <span className="text-text-xs font-semibold text-accent-text tabular-nums">
-              {(device.powerWatts / 1000).toFixed(2)} kW now
+              {device.powerWatts}W now
             </span>
           </div>
           <svg viewBox="0 0 320 90" className="w-full h-24">

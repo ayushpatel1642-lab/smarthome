@@ -89,6 +89,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [firebaseUser]);
 
+  // Keep Firebase ID token fresh for long-running sessions (refresh every 45 min)
+  useEffect(() => {
+    if (!firebaseUser) return;
+    const interval = setInterval(() => {
+      refreshToken();
+    }, 45 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [firebaseUser, refreshToken]);
+
   const signInWithGoogle = useCallback(async () => {
     setAuthError(null);
     try {

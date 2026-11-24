@@ -6,13 +6,14 @@ import { useHome } from '../../context/HomeContext';
 import type { AcMode, SmartDevice } from '../../types/home';
 import { formatTemp } from '../../utils/format';
 
-type CategoryFilter = 'all' | 'lighting' | 'climate' | 'security';
+type CategoryFilter = 'all' | 'lighting' | 'climate' | 'security' | 'appliance';
 
 const CATEGORIES: { id: CategoryFilter; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'lighting', label: 'Lighting' },
   { id: 'climate', label: 'Climate' },
   { id: 'security', label: 'Security' },
+  { id: 'appliance', label: 'Appliances' },
 ];
 
 const AC_MODES: AcMode[] = ['cool', 'heat', 'fan', 'auto'];
@@ -31,14 +32,16 @@ export const DevicesPage: React.FC = () => {
     setAcTemperature,
     setAcMode,
     toggleLock,
+    toggleSensorState,
     reconnectDevice,
     turnOffRoomLights,
   } = useHome();
 
   const [category, setCategory] = useState<CategoryFilter>(
-    ['all', 'lighting', 'climate', 'security'].includes(initialCat) ? initialCat : 'all'
+    ['all', 'lighting', 'climate', 'security', 'appliance'].includes(initialCat) ? initialCat : 'all'
   );
   const [selectedRoom, setSelectedRoom] = useState<string>('All Rooms');
+  const [searchQuery, setSearchQuery] = useState('');
   const [reconnectingId, setReconnectingId] = useState<number | null>(null);
 
   const unit = state.profile.tempUnit;
@@ -68,12 +71,18 @@ export const DevicesPage: React.FC = () => {
   }, [state.devices, state.rooms]);
 
   const filteredDevices = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
     return state.devices.filter((d) => {
       const catMatch = category === 'all' || d.category === category;
       const roomMatch = selectedRoom === 'All Rooms' || d.roomName === selectedRoom;
-      return catMatch && roomMatch;
+      const queryMatch =
+        !q ||
+        d.name.toLowerCase().includes(q) ||
+        d.roomName.toLowerCase().includes(q) ||
+        d.protocol.toLowerCase().includes(q);
+      return catMatch && roomMatch && queryMatch;
     });
-  }, [state.devices, category, selectedRoom]);
+  }, [state.devices, category, selectedRoom, searchQuery]);
 
   const groupedByRoom = useMemo(() => {
     const groups = new Map<string, SmartDevice[]>();
@@ -109,7 +118,7 @@ export const DevicesPage: React.FC = () => {
     >
       <div className="space-y-4 pb-14 font-gellix">
         {/* Header Summary */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-title-xs font-semibold text-on-surface">Connected devices</h1>
             <p className="text-text-xs text-on-surface-variant mt-0.5 tabular-nums">
@@ -126,8 +135,33 @@ export const DevicesPage: React.FC = () => {
           </Button>
         </div>
 
-        {/* 4-Tab Category Segmented Filter */}
-        <div className="grid grid-cols-4 gap-1 p-1 rounded-lg bg-surface-container-low border border-outline">
+        {/* Search input */}
+        <div className="relative">
+          <span className="material-symbols-outlined text-[18px] text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2">
+            search
+          </span>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search devices by name, room, or protocol..."
+            aria-label="Search devices"
+            className="w-full h-10 pl-10 pr-9 rounded-lg bg-surface-container border border-outline text-text-s font-normal text-on-surface placeholder-gray-50 focus:outline-none focus:border-accent-text transition-colors"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
+            >
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          )}
+        </div>
+
+        {/* 5-Tab Category Segmented Filter */}
+        <div className="grid grid-cols-5 gap-1 p-1 rounded-lg bg-surface-container-low border border-outline overflow-x-auto no-scrollbar">
           {CATEGORIES.map((c) => {
             const active = category === c.id;
             return (
@@ -135,7 +169,7 @@ export const DevicesPage: React.FC = () => {
                 key={c.id}
                 type="button"
                 onClick={() => handleCategoryChange(c.id)}
-                className={`py-2 rounded-lg text-text-xs font-semibold transition-colors whitespace-nowrap ${
+                className={`py-2 px-1.5 rounded-lg text-text-xs font-semibold transition-colors whitespace-nowrap ${
                   active
                     ? 'bg-amplitude-blue text-white'
                     : 'text-on-surface-variant hover:text-on-surface'
@@ -171,14 +205,27 @@ export const DevicesPage: React.FC = () => {
 
         {/* Room-grouped Device Cards */}
         {groupedByRoom.length === 0 ? (
-          <div className="rounded-xl bg-surface-container border border-outline p-8 text-center">
-            <span className="material-symbols-outlined text-[32px] text-on-surface-variant mb-2">
+          <div className="rounded-xl bg-surface-container border border-outline p-8 text-center space-y-2">
+            <span className="material-symbols-outlined text-[32px] text-on-surface-variant">
               devices_off
             </span>
             <p className="text-text-s font-semibold text-on-surface">No devices match this filter</p>
-            <p className="text-text-xs text-on-surface-variant mt-1">
-              Select another category or add a new simulated device.
+            <p className="text-text-xs text-on-surface-variant">
+              Clear your search or choose another category.
             </p>
+            {(searchQuery || category !== 'all' || selectedRoom !== 'All Rooms') && (
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => {
+                  setSearchQuery('');
+                  handleCategoryChange('all');
+                  setSelectedRoom('All Rooms');
+                }}
+              >
+                Reset filters
+              </Button>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
@@ -220,26 +267,30 @@ export const DevicesPage: React.FC = () => {
                             key={device.id}
                             className="rounded-xl bg-surface-container border border-error/50 p-4 flex items-center justify-between gap-3"
                           >
-                            <div className="flex items-center gap-3 min-w-0">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/device-detail/${device.id}`)}
+                              className="flex items-center gap-3 min-w-0 text-left group"
+                            >
                               <div className="w-10 h-10 rounded-lg bg-error/10 text-error flex items-center justify-center shrink-0">
                                 <span className="material-symbols-outlined text-[20px]">
                                   {device.icon}
                                 </span>
                               </div>
                               <div className="min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-text-s font-semibold text-on-surface truncate">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-text-s font-semibold text-on-surface group-hover:text-accent-text truncate">
                                     {device.name}
                                   </span>
-                                  <span className="text-text-xs font-semibold text-error">
+                                  <span className="text-text-xs font-semibold text-error shrink-0">
                                     · Offline
                                   </span>
                                 </div>
-                                <p className="text-text-xs text-on-surface-variant mt-0.5">
+                                <p className="text-text-xs text-on-surface-variant mt-0.5 truncate">
                                   Last seen {device.lastSeen} · {device.protocol}
                                 </p>
                               </div>
-                            </div>
+                            </button>
                             <Button
                               variant="secondary"
                               size="small"
@@ -363,7 +414,11 @@ export const DevicesPage: React.FC = () => {
                             key={device.id}
                             className="rounded-xl bg-surface-container border border-outline p-4 flex items-center justify-between gap-3"
                           >
-                            <div className="flex items-center gap-3 min-w-0">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/device-detail/${device.id}`)}
+                              className="flex items-center gap-3 min-w-0 text-left group"
+                            >
                               <div
                                 className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
                                   locked
@@ -376,15 +431,20 @@ export const DevicesPage: React.FC = () => {
                                 </span>
                               </div>
                               <div className="min-w-0">
-                                <div className="text-text-s font-semibold text-on-surface truncate">
-                                  {device.name}
+                                <div className="flex items-center gap-1">
+                                  <span className="text-text-s font-semibold text-on-surface group-hover:text-accent-text truncate">
+                                    {device.name}
+                                  </span>
+                                  <span className="material-symbols-outlined text-[15px] text-on-surface-variant">
+                                    chevron_right
+                                  </span>
                                 </div>
                                 <p className="text-text-xs text-on-surface-variant tabular-nums">
                                   {locked ? 'Secured' : 'Unlocked'} · Battery{' '}
                                   {device.battery ?? 88}%
                                 </p>
                               </div>
-                            </div>
+                            </button>
                             <Button
                               variant={locked ? 'secondary' : 'primary'}
                               size="small"
@@ -403,7 +463,11 @@ export const DevicesPage: React.FC = () => {
                           className="rounded-xl bg-surface-container border border-outline p-4 space-y-3"
                         >
                           <div className="flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-3 min-w-0">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/device-detail/${device.id}`)}
+                              className="flex items-center gap-3 min-w-0 text-left group"
+                            >
                               <div
                                 className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
                                   device.isOn
@@ -416,8 +480,13 @@ export const DevicesPage: React.FC = () => {
                                 </span>
                               </div>
                               <div className="min-w-0">
-                                <div className="text-text-s font-semibold text-on-surface truncate">
-                                  {device.name}
+                                <div className="flex items-center gap-1">
+                                  <span className="text-text-s font-semibold text-on-surface group-hover:text-accent-text truncate">
+                                    {device.name}
+                                  </span>
+                                  <span className="material-symbols-outlined text-[15px] text-on-surface-variant">
+                                    chevron_right
+                                  </span>
                                 </div>
                                 <p className="text-text-xs text-on-surface-variant truncate tabular-nums">
                                   {isLight
@@ -429,7 +498,7 @@ export const DevicesPage: React.FC = () => {
                                       : 'Standby · 0W'}
                                 </p>
                               </div>
-                            </div>
+                            </button>
 
                             <button
                               type="button"
@@ -475,7 +544,7 @@ export const DevicesPage: React.FC = () => {
                     })}
                   </div>
 
-                  {/* 2-Column Sensor Tiles */}
+                  {/* 2-Column Sensor Tiles (clickable to detail + quick simulate toggle) */}
                   {sensors.length > 0 && (
                     <div className="grid grid-cols-2 gap-3">
                       {sensors.map((sensor) => {
@@ -484,35 +553,50 @@ export const DevicesPage: React.FC = () => {
                         return (
                           <div
                             key={sensor.id}
-                            className={`rounded-xl border p-3.5 ${
+                            className={`rounded-xl border p-3.5 space-y-2 ${
                               isTriggered
                                 ? 'bg-error-container border-error/50'
                                 : 'bg-surface-container border-outline'
                             }`}
                           >
-                            <div className="flex items-center justify-between mb-2">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/device-detail/${sensor.id}`)}
+                              className="w-full text-left group"
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span
+                                  className={`material-symbols-outlined text-[20px] ${
+                                    isTriggered ? 'text-error' : 'text-accent-text'
+                                  }`}
+                                >
+                                  {sensor.icon}
+                                </span>
+                                <span className="text-text-xxs text-on-surface-variant tabular-nums">
+                                  {sensor.battery ?? 94}%
+                                </span>
+                              </div>
+                              <div className="text-text-xs font-semibold text-on-surface group-hover:text-accent-text truncate">
+                                {sensor.name}
+                              </div>
+                            </button>
+                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-outline/60">
                               <span
-                                className={`material-symbols-outlined text-[20px] ${
-                                  isTriggered ? 'text-error' : 'text-accent-text'
+                                className={`text-text-xs ${
+                                  isTriggered
+                                    ? 'text-error font-semibold'
+                                    : 'text-on-surface-variant'
                                 }`}
                               >
-                                {sensor.icon}
+                                {sensor.sensorStatus || 'Clear'}
                               </span>
-                              <span className="text-text-xxs text-on-surface-variant tabular-nums">
-                                {sensor.battery ?? 94}%
-                              </span>
-                            </div>
-                            <div className="text-text-xs font-semibold text-on-surface truncate">
-                              {sensor.name}
-                            </div>
-                            <div
-                              className={`text-text-xs mt-0.5 ${
-                                isTriggered
-                                  ? 'text-error font-semibold'
-                                  : 'text-on-surface-variant'
-                              }`}
-                            >
-                              {sensor.sensorStatus || 'Clear'}
+                              <button
+                                type="button"
+                                onClick={() => toggleSensorState(sensor.id)}
+                                className="text-text-xxs font-semibold text-accent-text hover:underline"
+                              >
+                                Simulate
+                              </button>
                             </div>
                           </div>
                         );

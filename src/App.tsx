@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { ToastBanner } from './components/common/ToastBanner';
 import { AuthProvider } from './context/AuthContext';
@@ -19,7 +20,8 @@ import { SettingsPage } from './pages/Settings/SettingsPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
       <AuthProvider>
         <HomeProvider>
           <Routes>
@@ -133,6 +135,7 @@ export default function App() {
           <ToastBanner />
         </HomeProvider>
       </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

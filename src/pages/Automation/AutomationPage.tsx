@@ -112,7 +112,11 @@ export const AutomationPage: React.FC = () => {
               <Button
                 variant="secondary"
                 size="small"
-                onClick={() => navigate('/rule-builder')}
+                onClick={() =>
+                  navigate('/rule-builder', {
+                    state: { draftFromRecommendation: routineSuggestion },
+                  })
+                }
               >
                 Edit
               </Button>

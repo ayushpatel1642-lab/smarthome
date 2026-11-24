@@ -123,8 +123,11 @@ export const homeApi = {
       tariffPeak: number;
     }
   ) =>
-    apiFetch<AiRecommendation & { source?: 'gemini' | 'deterministic' }>('/api/ai/recommend', token, {
+    apiFetch<AiRecommendation & { source?: 'gemini' | 'local_heuristic' }>('/api/ai/recommend', token, {
       method: 'POST',
       body: JSON.stringify({ snapshot }),
     }),
+
+  resetResidence: (token: string) =>
+    apiFetch<HomeStatePayload>('/api/reset', token, { method: 'POST' }),
 };

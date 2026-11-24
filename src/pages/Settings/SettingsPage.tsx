@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/common/Button';
 import { ConfirmDialog } from '../../components/common/ConfirmDialog';
@@ -8,10 +8,23 @@ import { useHome } from '../../context/HomeContext';
 import type { TempUnit, ThemePreference } from '../../types/home';
 import { getInitials } from '../../utils/format';
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { authMode, signOut } = useAuth();
-  const { state, updateProfile, addRoom, removeRoom, exportTelemetryJson, showToast } = useHome();
+  const {
+    state,
+    updateProfile,
+    addRoom,
+    removeRoom,
+    exportTelemetryJson,
+    resetResidenceData,
+    showToast,
+  } = useHome();
 
   const profile = state.profile;
 
@@ -27,6 +40,38 @@ export const SettingsPage: React.FC = () => {
   const [tariffPeakDraft, setTariffPeakDraft] = useState(String(profile.tariffPeak));
 
   const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallApp = async () => {
+    if (!installPrompt) {
+      showToast('Use your browser menu to add Aware Home to your home screen', 'info');
+      return;
+    }
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    if (choice.outcome === 'accepted') {
+      showToast('Aware Home installed to device', 'success');
+    }
+    setInstallPrompt(null);
+  };
+
+  const handleResetResidence = async () => {
+    setResetting(true);
+    await resetResidenceData();
+    setResetting(false);
+    setResetConfirmOpen(false);
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -277,9 +322,29 @@ export const SettingsPage: React.FC = () => {
             </button>
           </div>
 
-          <Button variant="secondary" fullWidth className="h-10" onClick={exportTelemetryJson}>
-            <span className="material-symbols-outlined text-[18px] text-accent-text">download</span>
-            <span>Export telemetry archive (JSON)</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <Button variant="secondary" fullWidth className="h-10" onClick={exportTelemetryJson}>
+              <span className="material-symbols-outlined text-[18px] text-accent-text">download</span>
+              <span>Export JSON archive</span>
+            </Button>
+            <Button variant="secondary" fullWidth className="h-10" onClick={handleInstallApp}>
+              <span className="material-symbols-outlined text-[18px] text-accent-text">
+                install_mobile
+              </span>
+              <span>{installPrompt ? 'Install app' : 'Install shortcut'}</span>
+            </Button>
+          </div>
+
+          <Button
+            variant="tertiary-alt"
+            isDanger
+            fullWidth
+            isLoading={resetting}
+            className="h-9"
+            onClick={() => setResetConfirmOpen(true)}
+          >
+            <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+            <span>Reset residence to defaults</span>
           </Button>
         </section>
 
@@ -480,6 +545,17 @@ export const SettingsPage: React.FC = () => {
         icon="logout"
         onConfirm={handleSignOut}
         onCancel={() => setSignOutConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        open={resetConfirmOpen}
+        title="Reset residence to defaults?"
+        description="All custom rooms, devices, automations, and security logs will be restored to the initial residence configuration."
+        confirmLabel="Reset residence"
+        tone="danger"
+        icon="restart_alt"
+        onConfirm={handleResetResidence}
+        onCancel={() => setResetConfirmOpen(false)}
       />
     </AppShell>
   );

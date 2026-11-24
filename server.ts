@@ -15,6 +15,7 @@ import {
   deleteRoom,
   getFullHomeState,
   insertRecommendation,
+  resetUserHomeData,
   updateAutomation,
   updateDevice,
   updateRecommendationStatus,
@@ -163,6 +164,12 @@ async function startServer() {
       for (const k of keys) {
         if (req.body[k] !== undefined) allowed[k] = req.body[k];
       }
+      if (typeof allowed.brightness === 'number') {
+        allowed.brightness = Math.max(0, Math.min(100, Math.round(allowed.brightness)));
+      }
+      if (typeof allowed.targetTemp === 'number') {
+        allowed.targetTemp = Math.max(16, Math.min(30, Math.round(allowed.targetTemp * 2) / 2));
+      }
 
       const updated = await updateDevice(req.user!.uid, deviceId, allowed);
       if (!updated) return res.status(404).json({ error: 'Device not found' });
@@ -217,7 +224,27 @@ async function startServer() {
     try {
       const id = Number(req.params.id);
       if (!Number.isInteger(id)) return res.status(400).json({ error: 'Invalid automation ID' });
-      const updated = await updateAutomation(req.user!.uid, id, req.body);
+      const allowed: Record<string, unknown> = {};
+      const keys = [
+        'name',
+        'description',
+        'enabled',
+        'triggerType',
+        'triggerLabel',
+        'triggerIcon',
+        'conditions',
+        'actions',
+        'days',
+        'startTime',
+        'endTime',
+        'priority',
+        'zoneLabel',
+        'lastTriggered',
+      ] as const;
+      for (const k of keys) {
+        if (req.body[k] !== undefined) allowed[k] = req.body[k];
+      }
+      const updated = await updateAutomation(req.user!.uid, id, allowed);
       if (!updated) return res.status(404).json({ error: 'Automation not found' });
       res.json(updated);
     } catch (error: unknown) {
@@ -283,6 +310,20 @@ async function startServer() {
       res.json(updated);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to update recommendation';
+      res.status(500).json({ error: msg });
+    }
+  });
+
+  // Reset residence to initial factory defaults
+  app.post('/api/reset', requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const uid = req.user!.uid;
+      const email = req.user!.email || 'resident@oakridge.home';
+      const name = typeof req.user!.name === 'string' ? req.user!.name : undefined;
+      const freshState = await resetUserHomeData(uid, email, name);
+      res.json(freshState);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Failed to reset residence';
       res.status(500).json({ error: msg });
     }
   });

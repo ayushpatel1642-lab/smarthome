@@ -977,3 +977,31 @@ export async function insertRecommendation(
     throw new Error('Failed to save recommendation.', { cause: error });
   }
 }
+
+export async function resetUserHomeData(uid: string, email: string, displayName?: string) {
+  try {
+    await Promise.all([
+      db.delete(devices).where(eq(devices.userUid, uid)),
+      db.delete(automations).where(eq(automations.userUid, uid)),
+      db.delete(securityEvents).where(eq(securityEvents.userUid, uid)),
+      db.delete(recommendations).where(eq(recommendations.userUid, uid)),
+      db.delete(energyLogs).where(eq(energyLogs.userUid, uid)),
+    ]);
+    await db.delete(rooms).where(eq(rooms.userUid, uid));
+    await db
+      .update(users)
+      .set({
+        houseMode: 'home',
+        securityMode: 'home',
+        securityAlertActive: false,
+      })
+      .where(eq(users.uid, uid));
+
+    await seedInitialHomeData(uid);
+    return await getFullHomeState(uid, email, displayName);
+  } catch (error) {
+    console.error('Database error in resetUserHomeData:', error);
+    throw new Error('Failed to reset residence data.', { cause: error });
+  }
+}
+

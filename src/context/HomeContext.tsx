@@ -54,6 +54,7 @@ interface HomeContextValue {
   setAcMode: (deviceId: number, acMode: AcMode) => Promise<void>;
   setAcFanSpeed: (deviceId: number, fanSpeed: FanSpeed) => Promise<void>;
   toggleLock: (deviceId: number) => Promise<void>;
+  toggleSensorState: (deviceId: number) => Promise<void>;
   reconnectDevice: (deviceId: number) => Promise<void>;
   renameDevice: (deviceId: number, newName: string) => Promise<void>;
   removeDevice: (deviceId: number) => Promise<void>;
@@ -78,13 +79,14 @@ interface HomeContextValue {
     editingId?: number
   ) => Promise<AutomationRule | null>;
   deleteAutomation: (id: number) => Promise<void>;
-  testAutomationRule: (rule: Pick<AutomationRule, 'name' | 'actions'>) => Promise<void>;
+  testAutomationRule: (rule: Pick<AutomationRule, 'name' | 'actions'> & { id?: number }) => Promise<void>;
   applyRecommendation: (rec: AiRecommendation) => Promise<void>;
   dismissRecommendation: (recId: number) => Promise<void>;
   requestGeminiRecommendation: () => Promise<void>;
   generatingAi: boolean;
   clearSecurityLog: () => Promise<void>;
   exportTelemetryJson: () => void;
+  resetResidenceData: () => Promise<void>;
 }
 
 const LOCAL_STATE_PREFIX = 'aware_home_state_v1_';
@@ -192,6 +194,29 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return () => mq.removeEventListener('change', apply);
     }
   }, [state.profile.theme]);
+
+  // Live thermal convergence loop: gently drifts room currentTemp toward AC targetTemp when AC is running
+  useEffect(() => {
+    if (!user) return;
+    const timer = setInterval(() => {
+      setState((prev) => {
+        let changed = false;
+        const nextDevices = prev.devices.map((d) => {
+          if (d.deviceType !== 'ac' || !d.online || !d.isOn) return d;
+          const target = d.targetTemp ?? 24;
+          const curr = d.currentTemp ?? 24.5;
+          const diff = target - curr;
+          if (Math.abs(diff) < 0.08) return d;
+          changed = true;
+          const step = diff > 0 ? 0.1 : -0.1;
+          const nextTemp = Math.round((curr + step) * 10) / 10;
+          return { ...d, currentTemp: nextTemp };
+        });
+        return changed ? { ...prev, devices: nextDevices } : prev;
+      });
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [user]);
 
   const recordEvent = useCallback(
     async (event: Omit<SecurityEvent, 'id'>) => {
@@ -373,6 +398,46 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       showToast(`${target.name} ${nextLocked ? 'locked' : 'unlocked'}`, nextLocked ? 'success' : 'warning');
     },
     [state.devices, patchDeviceState, recordEvent, showToast]
+  );
+
+  const toggleSensorState = useCallback(
+    async (deviceId: number) => {
+      const target = state.devices.find((d) => d.id === deviceId);
+      if (!target) return;
+      const isMotion = target.deviceType === 'motion_sensor';
+      const currentlyTriggered =
+        target.sensorStatus === 'Motion' || target.sensorStatus === 'Open';
+      const nextStatus = isMotion
+        ? currentlyTriggered
+          ? 'Clear'
+          : 'Motion'
+        : currentlyTriggered
+          ? 'Closed'
+          : 'Open';
+
+      await patchDeviceState(deviceId, { sensorStatus: nextStatus, lastSeen: 'Just now' });
+      const armed = state.profile.securityMode !== 'disarmed';
+      const isAlertTrigger = !currentlyTriggered && armed;
+
+      if (isAlertTrigger) {
+        await updateProfile({ securityAlertActive: true });
+      }
+      await recordEvent({
+        title: `${target.name}: ${nextStatus}`,
+        detail: isAlertTrigger
+          ? `Triggered while perimeter armed (${state.profile.securityMode} mode)`
+          : `Simulated sensor state changed to ${nextStatus}`,
+        severity: isAlertTrigger ? 'critical' : currentlyTriggered ? 'info' : 'warning',
+        zone: target.roomName,
+        icon: isAlertTrigger ? 'warning' : target.icon,
+        timeLabel: formatTimeNow(),
+      });
+      showToast(
+        `${target.name} state set to ${nextStatus}`,
+        isAlertTrigger ? 'error' : 'info'
+      );
+    },
+    [state.devices, state.profile.securityMode, patchDeviceState, updateProfile, recordEvent, showToast]
   );
 
   const reconnectDevice = useCallback(
@@ -777,7 +842,7 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 
   const testAutomationRule = useCallback(
-    async (rule: Pick<AutomationRule, 'name' | 'actions'>) => {
+    async (rule: Pick<AutomationRule, 'name' | 'actions'> & { id?: number }) => {
       const ac = state.devices.find((d) => d.deviceType === 'ac');
       for (const act of rule.actions) {
         if (act.actionType === 'arm_security') {
@@ -792,6 +857,20 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await lockAllDoors();
         }
       }
+      if (rule.id) {
+        const triggeredLabel = `Tested ${formatTimeNow()}`;
+        setState((prev) => ({
+          ...prev,
+          automations: prev.automations.map((a) =>
+            a.id === rule.id ? { ...a, lastTriggered: triggeredLabel } : a
+          ),
+        }));
+        if (authMode === 'firebase' && idToken) {
+          homeApi
+            .updateAutomation(idToken, rule.id, { lastTriggered: triggeredLabel })
+            .catch(console.error);
+        }
+      }
       await recordEvent({
         title: `Rule executed: ${rule.name}`,
         detail: `${rule.actions.length} simulated action(s) applied cleanly`,
@@ -802,7 +881,17 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       showToast(`Test passed: "${rule.name}" executed ${rule.actions.length} action(s)`, 'success');
     },
-    [state.devices, updateProfile, setAcTemperature, turnOffAllLights, lockAllDoors, recordEvent, showToast]
+    [
+      state.devices,
+      authMode,
+      idToken,
+      updateProfile,
+      setAcTemperature,
+      turnOffAllLights,
+      lockAllDoors,
+      recordEvent,
+      showToast,
+    ]
   );
 
   const applyRecommendation = useCallback(
@@ -964,6 +1053,26 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [idToken, state.profile, derived, showToast]);
 
+  const resetResidenceData = useCallback(async () => {
+    if (!user) return;
+    if (authMode === 'firebase' && idToken) {
+      try {
+        const fresh = await homeApi.resetResidence(idToken);
+        setState(fresh);
+        showToast('Residence restored to factory defaults', 'success');
+        return;
+      } catch (err) {
+        console.error('Failed to reset Cloud SQL state:', err);
+        showToast('Unable to reset cloud residence right now.', 'error');
+        return;
+      }
+    }
+    const fresh = createDefaultHomeState(user.uid, user.email, user.displayName);
+    setState(fresh);
+    localStorage.setItem(`${LOCAL_STATE_PREFIX}${user.uid}`, JSON.stringify(fresh));
+    showToast('Residence restored to factory defaults', 'success');
+  }, [user, authMode, idToken, showToast]);
+
   return (
     <HomeContext.Provider
       value={{
@@ -985,6 +1094,7 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAcMode,
         setAcFanSpeed,
         toggleLock,
+        toggleSensorState,
         reconnectDevice,
         renameDevice,
         removeDevice,
@@ -1004,6 +1114,7 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         generatingAi,
         clearSecurityLog,
         exportTelemetryJson,
+        resetResidenceData,
       }}
     >
       {children}
